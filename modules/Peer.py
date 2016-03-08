@@ -24,12 +24,14 @@ class Peer(object):
 
 	def __init__(self):
 		#Loading file list
-		listFile = open('list.txt','r+')
+		listFile = open('list.txt','w+')
 		result = listFile.read()
-		files = json.loads(result)
-		for f in files:
-			obj = SharedFile(f["name"],f["md5"],f["shared"])
-			self.filesList.append(obj)
+
+		if not result == "":
+			files = json.loads(result)
+			for f in files:
+				obj = SharedFile(f["name"],f["md5"],f["shared"])
+				self.filesList.append(obj)
 
 		#print("List of available files:")
 		#Searching for new sharable
