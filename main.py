@@ -2,24 +2,42 @@
 
 #modules
 from modules.Peer import Peer
-from modules.SharedFile import SharedFile
 
-#program flow
-#Peer initialization
+
+# program flow
+# Peer initialization
 p = Peer()
 
-# for file in p.filesList:
-# 	print("File name: " + file.name + "\nFile md5: "+ file.md5 + "\nShared: " + file.shared + "\n\n")
 
-# while 1:
-#   print("Select one of the following options:")
-#   print("1: LogIn")
-#   print("2: Add File")
-#   print("3: Remove File")
-#   print("4: Search File")
-#   print("5: Download File")
-#   print("6: LogOut")
-#   option = input()
-#   print("You've selected: " + option)
+while p.SessionId == "":
+	print("Select one of the following options:")
+	print("1: Log In")
+	option = input()
+	if option != "1":
+		print(option + " not recognized as a command")
+	else:
+		print('Logging in...')
 
+		# TODO: Login
+		p.login()
+		print('Completed.')
 
+		while 1:
+			print("Select one of the following options:")
+			print("1: Add File")
+			print("2: Remove File")
+			print("3: Search File")
+			print("4: LogOut")
+
+			option = input()
+
+			if option == "1":
+				p.share()
+			elif option == "2":
+				p.remove()
+			elif option == "3":
+				p.search()
+			elif option == "4":
+				p.logout()
+			else:
+				print(option + " not recognized as a command")

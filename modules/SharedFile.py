@@ -10,3 +10,4 @@ class SharedFile:
 
 	def dump(self):
 		return {'name': self.name, 'md5': self.md5, 'shared': self.shared}
+
