@@ -25,7 +25,15 @@ s.listen(1)
 conn, addr = s.accept()
 print 'Connection address:', addr
 while 1:
-    cmd = conn.recv(4)
+
+    response = 'ADEL' + str(993).zfill(3)
+    print response
+    conn.send(response)
+
+conn.close()
+
+'''
+cmd = conn.recv(4)
 
     if not cmd: break
     print "received command: " + str(cmd)
@@ -46,6 +54,7 @@ while 1:
             filemd5 = hashfile(open("../shareable/" + file, 'rb'), hashlib.md5())
             filename = file.ljust(100)
             copies = str(2).zfill(3)
+            print copies
             response += filemd5
             response += filename
             response += copies  # 2 copie
@@ -53,8 +62,4 @@ while 1:
             response += '03000'
             response += '172.030.008.002|fc00:0000:0000:0000:0000:0000:0008:0002'
             response += '03000'
-
-    print "\n\nResponse: \n" + response + "\n\n"
-    conn.send(response)
-
-conn.close()
+            '''

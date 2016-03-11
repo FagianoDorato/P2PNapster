@@ -66,8 +66,12 @@ class Peer(object):
                 s.send(formatSend)
 
                 print formatSend
-                print s.recv(7)
+                response=s.recv(7)
+                print response
+                print "after insert.."
+                print "files inside the directory: "+response[-3:]
                 print "done"
+
 
     def remove(self):
         print "Select a file to remove"
@@ -86,8 +90,15 @@ class Peer(object):
                 s.send(formatSend)
 
                 print formatSend
-                print s.recv(7)
-                print "done"
+                response=s.recv(7)
+                print response
+
+                if response[-3:] == '999':
+                    print "file not exist in a directory"
+                else:
+                    print "after removing.."
+                    print "files inside the directory: "+response[-3:]
+                    print "done"
 
     def search(self):
         print "Insert search term:"
