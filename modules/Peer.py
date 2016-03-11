@@ -5,6 +5,8 @@ from SharedFile import SharedFile
 import hashlib
 import socket
 
+dirIP = '127.0.0.1'
+port = 3000
 
 # Helper Methods
 def hashfile(afile, hasher, blocksize=65536):
@@ -55,10 +57,14 @@ class Peer(object):
             if idx == int(option):
                 print "Adding file " + file.name
                 # TODO: add file
-                formatSend = "ADDF" + self.SessionId + file.md5 + file.name
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-                # TODO: modify file shared status in list.txt
-                file.shared = "true"
+                s.connect((dirIP, port))
+                formatSend = 'ADDF' + self.SessionId + file.md5 + file.name.ljust(100)
+                s.send(formatSend)
+
+                print formatSend
+                print s.recv(7)
                 print "done"
 
     def remove(self):
@@ -71,14 +77,15 @@ class Peer(object):
             if idx == int(option):
                 print "Removing file " + file.name
                 # TODO: remove file
-                for root, dirs, files in os.walk("shareable"):
-                    for file in files:
-                        fileMd5 = hashfile(open("shareable/" + file.name, 'rb'), hashlib.md5())
-                        # if file exist already, delete it
-                        if fileExists(self.filesList, fileMd5):
-                            self.filesList.remove(file.name)
-                # TODO: modify file shared status in list.txt
-                print "Done"
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+                s.connect((dirIP, port))
+                formatSend = 'DELF' + self.SessionId + file.md5
+                s.send(formatSend)
+
+                print formatSend
+                print s.recv(7)
+                print "done"
 
     def search(self):
         print "Insert search term:"
@@ -87,11 +94,7 @@ class Peer(object):
         # TODO: search files
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        dirIP = '127.0.0.1'
-        port = 3000
-
         s.connect((dirIP, port))
-
         cmd = 'FIND' + self.SessionId + term.ljust(20)
         s.send(cmd)
 
