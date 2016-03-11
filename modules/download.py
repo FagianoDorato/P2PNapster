@@ -29,3 +29,6 @@ def get_file(host, port, file_md5):
     f.close()
     s.close()
     return "OK"
+
+def warns_directory():
+    pass

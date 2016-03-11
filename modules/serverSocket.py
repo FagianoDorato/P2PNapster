@@ -11,7 +11,9 @@ def convert_to_string(no, numBytes):
         num += 1
     return result
 
-def clientthread(conn):
+def clientthread(conn, lista_file):
+        #manca controllo lista per reperimento file da sharable
+
         cmd = conn.recv(4)
 
         if cmd == 'RETR':
@@ -69,7 +71,7 @@ def start_server(lista_file):
             print 'Connected by', addr
 
             #start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
-            start_new_thread(clientthread ,(conn,))
+            start_new_thread(clientthread ,(conn, lista_file))
         s.close()
     else:
         return "Server inizializzato!"
