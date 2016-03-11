@@ -2,8 +2,10 @@
 import json
 import os
 from SharedFile import SharedFile
+from Owner import Owner
 import hashlib
 import socket
+import base64
 
 
 # Helper Methods
@@ -91,14 +93,43 @@ class Peer(object):
         port = 3000
 
         s.connect((dirIP, port))
-
         cmd = 'FIND' + self.SessionId + term.ljust(20)
         s.send(cmd)
 
-        r = s.recv(8000)
-        print "Command: " + str(r)
+        r = s.recv(4)
+        if not r == 'AFIN':
+            print "Error"
+        else:
+            idmd5 = s.recv(3)
+            if idmd5 != 0:  # At least one result
+                availableFiles = []
 
-        availableFiles = []
+                for idx in range(0, int(idmd5)):
+                    file_i_md5 = s.recv(16)
+                    file_i_name = s.recv(100).strip()
+                    file_i_copies = s.recv(3)
+                    file_owners = []
+                    for copy in range(0, int(file_i_copies)):
+                        owner_j_ipv4 = s.recv(16).replace("|", "")  # ipv4
+                        owner_j_ipv6 = s.recv(39)  # ipv6
+                        owner_j_port = s.recv(5)  # port
+                        file_owners.append(Owner(owner_j_ipv4, owner_j_ipv6, owner_j_port))
+
+                    availableFiles.append(SharedFile(file_i_name, file_i_md5, file_owners))
+
+                print "Files matching the search term: "
+                for file in availableFiles:
+                    print "\n\nname: " + file.name
+                    print "md5: " + base64.encodestring(file.md5)
+
+                    for idx, owner in enumerate(file.owners):
+                        print "Owner " + str(idx)
+                        print "ipv4: " + str(owner.ipv4)
+                        print "ipv6: " + str(owner.ipv6)
+                        print "port: " + str(owner.port)
+
+            else:
+                print "No results found for search term: " + term
 
     # self.download(availableFiles)
 

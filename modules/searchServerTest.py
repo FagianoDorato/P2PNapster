@@ -46,7 +46,6 @@ while 1:
             filemd5 = hashfile(open("../shareable/" + file, 'rb'), hashlib.md5())
             filename = file.ljust(100)
             copies = str(2).zfill(3)
-            print copies
             response += filemd5
             response += filename
             response += copies  # 2 copie
@@ -55,7 +54,7 @@ while 1:
             response += '172.030.008.002|fc00:0000:0000:0000:0000:0000:0008:0002'
             response += '03000'
 
-    print response
+    print "\n\nResponse: \n" + response + "\n\n"
     conn.send(response)
 
 conn.close()
