@@ -12,7 +12,7 @@ def hashfile(afile, hasher, blocksize=65536):
     while len(buf) > 0:
         hasher.update(buf)
         buf = afile.read(blocksize)
-    return hasher.hexdigest()[:16]
+    return hasher.digest()
 
 
 def fileExists(list, md5):
@@ -29,10 +29,10 @@ class Peer(object):
     filesList = []
 
     def __init__(self):
-        # Searching for sharable files
-        for root, dirs, files in os.walk("sharable"):
+        # Searching for shareable files
+        for root, dirs, files in os.walk("shareable"):
             for file in files:
-                fileMd5 = hashfile(open("sharable/" + file, 'rb'), hashlib.md5())
+                fileMd5 = hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
                 newFile = SharedFile(file, fileMd5)
                 self.filesList.append(newFile)
 
@@ -71,9 +71,9 @@ class Peer(object):
             if idx == int(option):
                 print "Removing file " + file.name
                 # TODO: remove file
-                for root, dirs, files in os.walk("sharable"):
+                for root, dirs, files in os.walk("shareable"):
                     for file in files:
-                        fileMd5 = hashfile(open("sharable/" + file.name, 'rb'), hashlib.md5())
+                        fileMd5 = hashfile(open("shareable/" + file.name, 'rb'), hashlib.md5())
                         # if file exist already, delete it
                         if fileExists(self.filesList, fileMd5):
                             self.filesList.remove(file.name)
@@ -82,7 +82,7 @@ class Peer(object):
 
     def search(self):
         print "Insert search term:"
-        term = input()
+        term = raw_input()
         print "Searching files that match: " + term
         # TODO: search files
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -92,13 +92,11 @@ class Peer(object):
 
         s.connect((dirIP, port))
 
-        cmd = bytes('FIND', "utf-8") + bytes(self.SessionId, "utf-8") + bytes(term.ljust(20), "utf-8")
+        cmd = 'FIND' + self.SessionId + term.ljust(20)
         s.send(cmd)
 
-        r = s.recv(4)
+        r = s.recv(8000)
         print "Command: " + str(r)
-        r = s.recv(3)
-        print "#idmd5: " + str(r)
 
         availableFiles = []
 
