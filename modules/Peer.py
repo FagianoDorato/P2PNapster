@@ -9,7 +9,7 @@ def hashfile(afile, hasher, blocksize=65536):
     while len(buf) > 0:
         hasher.update(buf)
         buf = afile.read(blocksize)
-    return hasher.hexdigest()
+    return hasher.hexdigest()[:16]
 
 
 def fileExists(list,md5):
@@ -45,6 +45,8 @@ class Peer(object):
 					# File doesn't exist adding to the list
 					newFile = SharedFile(file,fileMd5,"false")
 					self.filesList.append(newFile)
+				else:
+					print("file already exist!")
 
 
 		# Saving list
@@ -70,20 +72,30 @@ class Peer(object):
 			if idx == int(option):
 				print("Adding file " + file.name)
 				# TODO: add file
+				formatSend="ADDF"+self.SessionId+file.md5+file.name
+
 				# TODO: modify file shared status in list.txt
-				print("Done")
+				file.shared = "true"
+				print("done")
+
 
 	def remove(self):
 		print("Select a file to remove")
 		for idx, file in enumerate(self.filesList):
 			if file.shared == "true":
-				print("" + idx + ": " + file.name)
+				print(str(idx) + ": " + file.name)
 		option = input()
 
 		for idx, file in enumerate(self.filesList):
 			if idx == int(option):
 				print("Removing file " + file.name)
 				# TODO: remove file
+				for root, dirs, files in os.walk("sharable"):
+					for file in files:
+						fileMd5 = hashfile(open("sharable/" + file.name, 'rb'), hashlib.md5())
+						#if file exist already, delete it
+						if fileExists(self.filesList, fileMd5):
+							self.filesList.remove(file.name)
 				# TODO: modify file shared status in list.txt
 				print("Done")
 
