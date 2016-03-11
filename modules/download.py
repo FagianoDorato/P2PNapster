@@ -1,28 +1,31 @@
 import socket
 
-s = socket.socket()
-s.connect(('localhost', 3000))
+def get_file(host, port, file_md5):
 
-def bytes_to_number(b):
-    # if Python2.x
-    # b = map(ord, b)
-    res = 0
-    for i in range(4):
-        res += b[i] << (i*8)
-    return res
-def get_file(s, file_name):
-    cmd = 'RETR' + file_name
+    s = socket.socket()
+    s.connect((host, port))
+
+    cmd = 'RETR' + file_md5
     s.sendall(cmd)
 
     r = s.recv(4)
-    print r
-    size = int(s.recv(16))
+    if r != 'ARET':
+        s.close()
+        return "Errone ARET from Peer"
+    numChunks = int(s.recv(6))
+    # uso md5 come nome del file
+    f = open('shareable/' + file_md5, 'wb')
     recvd = ''
-    while size > len(recvd):
-        data = s.recv(1024)
+    while numChunks > 0:
+        print '',numChunks
+        lenChunk = int(s.recv(5))
+        data = s.recv(lenChunk)
         if not data:
             break
         recvd += data
-    return recvd
+        numChunks -= 1
 
-print get_file(s, 'shareable/prova')
+    f.write(recvd)
+    f.close()
+    s.close()
+    return "OK"
