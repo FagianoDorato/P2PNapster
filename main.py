@@ -1,43 +1,42 @@
-#libraries
+import os
+from modules import Peer
 
-#modules
-from modules.Peer import Peer
-#ciao
+# ciao
 
 # program flow
 # Peer initialization
-p = Peer()
-
+p = Peer.Peer()
 
 while p.SessionId == "":
-	print("Select one of the following options:")
-	print("1: Log In")
-	option = input()
-	if option != "1":
-		print(option + " not recognized as a command")
-	else:
-		print('Logging in...')
+    print "Select one of the following options:"
+    print "1: Log In"
+    option = input()
+    if option != 1:
+        print str(option) + " not recognized as a command"
+    else:
+        print 'Logging in...'
 
-		# TODO: Login
-		p.login()
-		print('Completed.')
+        # TODO: Login
+        p.login()
+        print p.SessionId
+        print 'Completed.'
 
-		while 1:
-			print("Select one of the following options:")
-			print("1: Add File")
-			print("2: Remove File")
-			print("3: Search File")
-			print("4: LogOut")
+        while 1:
+            print "\n\nSelect one of the following options:"
+            print "1: Add File"
+            print "2: Remove File"
+            print "3: Search File"
+            print "4: LogOut"
 
-			option = input()
+            option = input()
 
-			if option == "1":
-				p.share()
-			elif option == "2":
-				p.remove()
-			elif option == "3":
-				p.search()
-			elif option == "4":
-				p.logout()
-			else:
-				print(option + " not recognized as a command")
+            if option == 1:
+                p.share()
+            elif option == 2:
+                p.remove()
+            elif option == 3:
+                p.search()
+            elif option == 4:
+                p.logout()
+            else:
+                print str(option) + " not recognized as a command"
