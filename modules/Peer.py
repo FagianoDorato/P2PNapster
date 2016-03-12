@@ -2,10 +2,10 @@
 import json
 import os
 from SharedFile import SharedFile
-from Owner import Owner
 import hashlib
 import socket
-import base64
+import Login
+import Connection
 
 dirIP = '127.0.0.1'
 port = 3000
@@ -29,6 +29,7 @@ class Peer(object):
     SessionId = ""
     Ipv4 = "172.30.8.2"
     Ipv6 = "fc00::8:2"
+    ipp2p = Ipv6 + Ipv4
     Port = "3000"
     filesList = []
 
@@ -42,7 +43,12 @@ class Peer(object):
 
     def login(self):
         # TODO: Log in and return sessionId
-        self.SessionId = "ashbnvdujghbyeur"
+        msg = ('LOGI' + 'fc00:0000:0000:0000:0000:0000:0008:0001' + '172.030.008.001' + self.Port)
+        c = Connection.Connection(self.ipp2p)
+        self.SessionId = c.send(msg)
+        print(self.SessionId)
+        #   self.SessionId = Login.session() old connection
+        return self.SessionId
 
     def logout(self):
         # TODO: Log out
@@ -111,40 +117,10 @@ class Peer(object):
         cmd = 'FIND' + self.SessionId + term.ljust(20)
         s.send(cmd)
 
-        r = s.recv(4)
-        if not r == 'AFIN':
-            print "Error"
-        else:
-            idmd5 = s.recv(3)
-            if idmd5 != 0:  # At least one result
-                availableFiles = []
+        r = s.recv(8000)
+        print "Command: " + str(r)
 
-                for idx in range(0, int(idmd5)):
-                    file_i_md5 = s.recv(16)
-                    file_i_name = s.recv(100).strip()
-                    file_i_copies = s.recv(3)
-                    file_owners = []
-                    for copy in range(0, int(file_i_copies)):
-                        owner_j_ipv4 = s.recv(16).replace("|", "")  # ipv4
-                        owner_j_ipv6 = s.recv(39)  # ipv6
-                        owner_j_port = s.recv(5)  # port
-                        file_owners.append(Owner(owner_j_ipv4, owner_j_ipv6, owner_j_port))
-
-                    availableFiles.append(SharedFile(file_i_name, file_i_md5, file_owners))
-
-                print "Files matching the search term: "
-                for file in availableFiles:
-                    print "\n\nname: " + file.name
-                    print "md5: " + base64.encodestring(file.md5)
-
-                    for idx, owner in enumerate(file.owners):
-                        print "Owner " + str(idx)
-                        print "ipv4: " + str(owner.ipv4)
-                        print "ipv6: " + str(owner.ipv6)
-                        print "port: " + str(owner.port)
-
-            else:
-                print "No results found for search term: " + term
+        availableFiles = []
 
     # self.download(availableFiles)
 
