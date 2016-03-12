@@ -61,4 +61,9 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-.idea
+.idea/
+
+.modules/Login.py
+.ProvaSocket.py
+.Server.py
+SocketOpen.py

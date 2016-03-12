@@ -31,7 +31,10 @@ class Peer(object):
     ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     ipp2p = ipv4 + ipv6
     port = "3000"
+    response_message = None
     filesList = []
+    number_share_files = 0
+
 
     def __init__(self):
         # Searching for shareable files
@@ -44,15 +47,29 @@ class Peer(object):
     def login(self):
         # TODO: Log in and return sessionId
         msg = ('LOGI' + self.ipv4 + '|' + self.ipv6 + self.port)
+        print('messaaggio login: ' + msg)
         c = Connection.Connection(self.ipp2p)
-        self.sessionId = c.send(msg)
-        print(self.sessionId)
-        #   self.sessionId = Login.session() old connection
+        c.socketDirectory.send(msg)
+        response_message = c.socketDirectory.recv(20)
+        self.sessionId = response_message[4:20]
+        if self.sessionId == '0000000000000000' or self.sessionId == '':
+            print "\tproblems with the login.\n\tPlease, try again."
+        else:
+            print('sessionID assigned by the directory: ' + self.sessionId)
+        c.socketDirectory.close()
         return self.sessionId
 
     def logout(self):
         # TODO: Log out
-        self.sessionId = ""
+        msg = ('LOGO' + self.sessionId)
+        print('message logout: ' + msg)
+        c = Connection.Connection(self.ipp2p)
+        c.socketDirectory.send(msg)
+        response_message = c.socketDirectory.recv(7)
+        number_file = int(response_message[4:7])
+        if number_file != self.number_share_files:
+            print('error number delete file')
+        self.sessionId = None
         return
 
     def share(self):

@@ -3,33 +3,30 @@
 import socket
 import os
 import sys
+import random
 from thread import *
 
 class Connection:
     SessionID = None
     socketDirectory = None
     socketPeer = None
-    #   message_sent = None
-    #   ipv4 = '172.30.8.2'
-    #   ipv4 = '172.30.0.1'
-    ipv4 = '127.0.0.1'
+    #ipv4 = '127.0.0.1'
     pp2p = 3000
     #   ipv6 = 'fc00::0:1'
     ipv6 = 'fc00::8:2'
-    boolean = True
+    boolean = random.randrange(0, 100) % 2
     string_read = None
     size = 1024
     message_received = None
 
     #   ip: string ipv6 + ipv4
     def __init__(self, ip):
-        self.ipv4 = ip[39:54]
-        self.ipv6 = ip[0:38]
-        self.pp2p = 3000
-
-    #   message_sent: message to be sent
-    def send(self, message_sent):
-        #   case: ipv4
+        self.ipv4 = ip[0:15]
+        self.ipv6 = ip[15:54]
+        self.ipv4 = '127.0.0.1'
+        self.ipv6 = '::1'
+        print (self.ipv4)
+        print (self.ipv6)
         if self.boolean:
             self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
@@ -37,30 +34,55 @@ class Connection:
                 print ("\t--->Succesfully connected ipv4!\n")
             except:
                 print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.")
-            while True:
-                self.socketDirectory.send(message_sent)
-                string_read = self.socketDirectory.recv(1024)
-            if not string_read:
-                return '000000'
             self.boolean = False
-            self.socketDirectory.close()
-            return string_read[5:17]
         #   case: ipv6
         else:
             self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
-                self.socketDirectory.bind((self.ipv6, self.pp2p))
+                self.socketDirectory.connect((self.ipv6, self.pp2p))
                 print ("\t--->Succesfully connected ipv6!\n")
             except:
                 print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.")
-            while True:
-                self.socketDirectory.send(message_sent)
-                string_read = self.socketDirectory.recv(1024)
-                if not string_read:
-                    return '000000'
                 self.boolean = True
-                self.socketDirectory.close()
-                return string_read
+
+    #def send(self):
+
+
+
+    # #   message_sent: message to be sent
+    # def send(self, message_sent):
+    #     #   case: ipv4
+    #     if self.boolean:
+    #         self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #         try:
+    #             self.socketDirectory.connect((self.ipv4, self.pp2p))
+    #             print ("\t--->Succesfully connected ipv4!\n")
+    #         except:
+    #             print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.")
+    #         while True:
+    #             self.socketDirectory.send(message_sent)
+    #             string_read = self.socketDirectory.recv(1024)
+    #         if not string_read:
+    #             return '000000'
+    #         self.boolean = False
+    #         self.socketDirectory.close()
+    #         return string_read[5:17]
+    #     #   case: ipv6
+    #     else:
+    #         self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    #         try:
+    #             self.socketDirectory.bind((self.ipv6, self.pp2p))
+    #             print ("\t--->Succesfully connected ipv6!\n")
+    #         except:
+    #             print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.")
+    #         while True:
+    #             self.socketDirectory.send(message_sent)
+    #             string_read = self.socketDirectory.recv(1024)
+    #             if not string_read:
+    #                 return '000000'
+    #             self.boolean = True
+    #             self.socketDirectory.close()
+    #             return string_read
 
     #   server
     def start_server(lista_file):
