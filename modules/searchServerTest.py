@@ -25,15 +25,15 @@ s.listen(1)
 conn, addr = s.accept()
 print 'Connection address:', addr
 while 1:
-
+    '''
     response = 'ADEL' + str(993).zfill(3)
     print response
     conn.send(response)
 
-conn.close()
+    conn.close()
 
-'''
-cmd = conn.recv(4)
+    '''
+    cmd = conn.recv(4)
 
     if not cmd: break
     print "received command: " + str(cmd)
@@ -62,4 +62,5 @@ cmd = conn.recv(4)
             response += '03000'
             response += '172.030.008.002|fc00:0000:0000:0000:0000:0000:0008:0002'
             response += '03000'
-            '''
+
+conn.close()

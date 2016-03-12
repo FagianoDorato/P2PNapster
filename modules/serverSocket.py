@@ -18,7 +18,7 @@ def clientthread(conn, lista_file):
 
         if cmd == 'RETR':
             file_name = conn.recv(16)
-            print "Nome file dal clien: ", file_name
+            print "Nome file dal client: ", file_name
             if os.path.exists(file_name):
                 length = os.path.getsize(file_name)
             length = os.stat(file_name).st_size

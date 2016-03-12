@@ -1,13 +1,12 @@
 import os
 from modules import Peer
+from modules import serverSocket
 
-# ciao
 
-# program flow
-# Peer initialization
+# main
 p = Peer.Peer()
 
-while p.SessionId == "":
+while p.sessionId == "":
     print "Select one of the following options:"
     print "1: Log In"
     option = input()
@@ -18,8 +17,10 @@ while p.SessionId == "":
 
         # TODO: Login
         p.login()
-        print p.SessionId
+        print p.sessionId
         print 'Completed.'
+
+        # TODO: Start peer server
 
         while 1:
             print "\n\nSelect one of the following options:"
@@ -38,5 +39,6 @@ while p.SessionId == "":
                 p.search()
             elif option == 4:
                 p.logout()
+                # TODO: stop peer server
             else:
                 print str(option) + " not recognized as a command"
