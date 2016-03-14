@@ -2,7 +2,7 @@
 import os
 from SharedFile import SharedFile
 from Owner import Owner
-import download
+import Download
 import hashlib
 import socket
 import Connection
@@ -198,4 +198,5 @@ class Peer(object):
             for idx2, owner in file.owners:
                 if option == idx2:
                     print "Downloading file..."
-                    download.get_file(owner.ipv4,owner.port,file.md5)
+                    Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
+                    Download.warns_directory(self.sessionId, file.md5)

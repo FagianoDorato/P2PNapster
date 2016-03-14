@@ -1,6 +1,6 @@
 import os
 from modules import Peer
-from modules import serverSocket
+from modules import ServerSocket
 import threading
 from multiprocessing import Process
 
