@@ -2,6 +2,7 @@
 import os
 from SharedFile import SharedFile
 from Owner import Owner
+import download
 import hashlib
 import socket
 import Connection
@@ -30,10 +31,11 @@ class Peer(object):
     ipv4 = "172.030.008.002"
     ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     ipp2p = ipv4 + ipv6
-    port = "3000"
+    port = "03000"
     response_message = None
     filesList = []
     number_share_files = 0
+
 
     def __init__(self):
         # Searching for shareable files
@@ -47,7 +49,7 @@ class Peer(object):
         # TODO: Log in and return sessionId
         msg = ('LOGI' + self.ipv4 + '|' + self.ipv6 + self.port)
         print('messaaggio login: ' + msg)
-        c = Connection.Connection(self.ipp2p)
+        c = Connection.Connection(self.ipv4, self.ipv6, int(self.port))
         c.socketDirectory.send(msg)
         response_message = c.socketDirectory.recv(20)
         self.sessionId = response_message[4:20]
@@ -61,7 +63,7 @@ class Peer(object):
         # TODO: Log out
         msg = 'LOGO' + self.sessionId
         print "message logout: " + msg
-        c = Connection.Connection(self.ipv4, self.ipv6)
+        c = Connection.Connection(self.ipv4, self.ipv6, int(self.port))
         c.socketDirectory.send(msg)
         response_message = c.socketDirectory.recv(7)
         number_file = int(response_message[4:7])
@@ -93,6 +95,7 @@ class Peer(object):
                 print "after insert.."
                 print "files inside the directory: "+response[-3:]
                 print "done"
+
 
     def remove(self):
         print "Select a file to remove"
@@ -164,6 +167,8 @@ class Peer(object):
                         print "ipv6: " + str(owner.ipv6)
                         print "port: " + str(owner.port)
 
+                self.download(availableFiles)
+
             elif idmd5 == 0:
                 print "No results found for search term: " + term
             else:
@@ -174,13 +179,20 @@ class Peer(object):
     def download(self, availableFiles):
         # visualizza i risultati della ricerca
         print "Select a file to download: "
-        print "lista file..."
+        for idx, file in enumerate(availableFiles):
+            print str(idx) + ": " + file.name
         # seleziona un file da scaricare
+        option = input()
 
         # visualizza la lista dei peer da cui è possibile scaricarlo
         print "Select a peer: "
-        print "lista peer con indirizzi..."
-        # seleziona un peer
+        for idx, file in enumerate(availableFiles):
+            if option == idx:
+                for idx2, owner in file.owners:
+                    print str(idx2) + ": " + owner.ipv4 + " | " + owner.ipv6 + " | " + owner.port
 
-        # download
-        print "download"
+            option = input()
+            for idx2, owner in file.owners:
+                if option == idx2:
+                    print "Downloading file..."
+                    download.get_file(owner.ipv4,owner.port,file.md5)

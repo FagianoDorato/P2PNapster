@@ -10,27 +10,27 @@ class Connection:
     #   SessionID = None
     socketDirectory = None
     socketPeer = None
-    #ipv4 = '127.0.0.1'
-    pp2p = 3000
-    #   ipv6 = 'fc00::0:1'
-    ipv6 = 'fc00::8:2'
+    ipv4 = None
+    port = None
+    ipv6 = None
     boolean = random.randrange(0, 100) % 2
     string_read = None
     size = 1024
     message_received = None
 
     #   ip: string ipv6 + ipv4
-    def __init__(self, ipv4, ipv6):
+    def __init__(self, ipv4, ipv6, port):
         self.ipv4 = ipv4
         self.ipv6 = ipv6
-        #   self.ipv4 = '127.0.0.1'
-        #   self.ipv6 = '::1'
+        self.port = port
+        self.ipv4 = '127.0.0.1'
+        self.ipv6 = '::1'
         print (self.ipv4)
         print (self.ipv6)
         if self.boolean:
             self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                self.socketDirectory.connect((self.ipv4, self.pp2p))
+                self.socketDirectory.connect((self.ipv4, self.port))
                 print ("\t--->Succesfully connected ipv4!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
@@ -38,7 +38,7 @@ class Connection:
         else:
             self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
-                self.socketDirectory.connect((self.ipv6, self.pp2p))
+                self.socketDirectory.connect((self.ipv6, self.port))
                 print ("\t--->Succesfully connected ipv6!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.\nSocket.error : %s" % msg)

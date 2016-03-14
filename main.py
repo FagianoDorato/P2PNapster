@@ -1,6 +1,7 @@
 import os
 from modules import Peer
 from modules import serverSocket
+from multiprocessing import Process
 
 
 # main
@@ -21,6 +22,8 @@ while p.sessionId == "":
         print 'Completed.'
 
         # TODO: Start peer server
+        thread = Process(target=serverSocket.start_server_multithread)
+        thread.start()
 
         while 1:
             print "\n\nSelect one of the following options:"
