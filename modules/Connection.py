@@ -23,11 +23,12 @@ class Connection:
         self.ipv4 = ipv4
         self.ipv6 = ipv6
         self.port = port
-        self.ipv4 = '127.0.0.1'
-        self.ipv6 = '::1'
+        #self.ipv4 = '127.0.0.1'
+        #self.ipv6 = '::1'
         print (self.ipv4)
         print (self.ipv6)
-        if self.boolean:
+        if False:
+
             self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 self.socketDirectory.connect((self.ipv4, self.port))
@@ -36,6 +37,7 @@ class Connection:
                 print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
         #   case: ipv6
         else:
+
             self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
                 self.socketDirectory.connect((self.ipv6, self.port))

@@ -1,13 +1,13 @@
 import os
 from modules import Peer
 from modules import serverSocket
+import threading
 from multiprocessing import Process
-
 
 # main
 p = Peer.Peer()
 
-while p.sessionId == "":
+while p.sessionId is None:
     print "Select one of the following options:"
     print "1: Log In"
     option = input()
@@ -22,10 +22,10 @@ while p.sessionId == "":
         print 'Completed.'
 
         # TODO: Start peer server
-        thread = Process(target=serverSocket.start_server_multithread)
-        thread.start()
+        #thread = threading.Thread(target=serverSocket.start_server_multithread)
+        #thread.start()
 
-        while 1:
+        while p.sessionId is not None:
             print "\n\nSelect one of the following options:"
             print "1: Add File"
             print "2: Remove File"

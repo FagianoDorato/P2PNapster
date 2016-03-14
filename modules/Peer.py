@@ -27,9 +27,9 @@ def fileExists(list, md5):
 
 
 class Peer(object):
-    sessionId = ""
-    ipv4 = "172.030.008.002"
-    ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
+    sessionId = None
+    ipv4 = "172.030.008.001"
+    ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
     ipp2p = ipv4 + ipv6
     port = "03000"
     response_message = None
@@ -57,7 +57,6 @@ class Peer(object):
             print "problems with the login.\nPlease, try again."
         else:
             print "sessionID assigned by the directory: " + self.sessionId
-        c.socketDirectory.close()
 
     def logout(self):
         # TODO: Log out
@@ -65,13 +64,17 @@ class Peer(object):
         print "message logout: " + msg
         c = Connection.Connection(self.ipv4, self.ipv6, int(self.port))
         c.socketDirectory.send(msg)
-        response_message = c.socketDirectory.recv(7)
-        number_file = int(response_message[4:7])
-        if number_file != self.number_share_files:
-            print "error number delete file"
-        self.sessionId = None
-        print "Logout completed"
-        c.socketDirectory.close()
+        cmd = c.socketDirectory.recv(4)
+        if not cmd:
+            print "error"
+        if cmd == "ALGO":
+            self.sessionId = None
+        #number_file = int(response_message[4:7])
+        #if number_file != self.number_share_files:
+        #    print "error number delete file"
+        #self.sessionId = None
+        #print "Logout completed"
+
 
     def share(self):
         print "Select a file to share"

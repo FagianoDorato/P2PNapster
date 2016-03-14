@@ -77,6 +77,7 @@ def start_server(lista_file):
     else:
         return "Server inizializzato!"
 
+
 def start_server_multithread():
 
     print "initializing server multithread"
@@ -109,10 +110,10 @@ def start_server_multithread():
         conn, addr = s.accept()
         print 'Connected by', addr
 
-        p = Process(target=clientthread, args=(conn,None))
-        p.start()
-        print "starter thread"
-
+        #thread = threading.Thread(target=clientthread)
+        #thread.start()
+        #print "starter thread"
+        #thread.joint()
 
         #start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
         #start_new_thread(clientthread, (conn, lista_file))

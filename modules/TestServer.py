@@ -22,9 +22,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
 
-conn, addr = s.accept()
-print 'Connection address:', addr
 while 1:
+    conn, addr = s.accept()
+    print 'Connection address:', addr
     cmd = conn.recv(4)
 
     if cmd == "FIND":
@@ -55,7 +55,10 @@ while 1:
                 response += '172.030.008.002|fc00:0000:0000:0000:0000:0000:0008:0002'
                 response += '03000'
 
+        conn.send(response)
+
     elif cmd == "LOGI":
+        print "received command: " + str(cmd)
         ipv4 = conn.recv(16).replace("|", "")  # ipv4
         print "received ipv4: " + str(ipv4)
         ipv6 = conn.recv(39)
@@ -65,15 +68,11 @@ while 1:
         response = 'AFIN' + '1234567891234567'
         print response
         conn.send(response)
-        s.listen(100)
-        cmd = conn.recv(20)
 
     elif cmd == 'LOGO':
-        sessionid = conn.recv(3)
+        print "received command: " + str(cmd)
+        sessionid = conn.recv(16)
         print "peer: " + sessionid
         response = 'ALGO' + '003'
         print response
         conn.send(response)
-
-
-conn.close()
