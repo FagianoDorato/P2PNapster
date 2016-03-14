@@ -7,7 +7,7 @@ import random
 from thread import *
 
 class Connection:
-    SessionID = None
+    #   SessionID = None
     socketDirectory = None
     socketPeer = None
     #ipv4 = '127.0.0.1'
@@ -20,11 +20,11 @@ class Connection:
     message_received = None
 
     #   ip: string ipv6 + ipv4
-    def __init__(self, ip):
-        self.ipv4 = ip[0:15]
-        self.ipv6 = ip[15:54]
-        self.ipv4 = '127.0.0.1'
-        self.ipv6 = '::1'
+    def __init__(self, ipv4, ipv6):
+        self.ipv4 = ipv4
+        self.ipv6 = ipv6
+        #   self.ipv4 = '127.0.0.1'
+        #   self.ipv6 = '::1'
         print (self.ipv4)
         print (self.ipv6)
         if self.boolean:
@@ -32,20 +32,16 @@ class Connection:
             try:
                 self.socketDirectory.connect((self.ipv4, self.pp2p))
                 print ("\t--->Succesfully connected ipv4!\n")
-            except:
-                print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.")
-            self.boolean = False
+            except socket.error, msg:
+                print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
         #   case: ipv6
         else:
             self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
                 self.socketDirectory.connect((self.ipv6, self.pp2p))
                 print ("\t--->Succesfully connected ipv6!\n")
-            except:
-                print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.")
-                self.boolean = True
-
-    #def send(self):
+            except socket.error, msg:
+                print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
 
 
 
@@ -123,6 +119,44 @@ class Connection:
             s.close()
         else:
             return "Server inizializzato!"
+
+    #   server by Zotti
+    @staticmethod
+    def server(self):
+        size = 20
+        print("start server")
+        socket_server = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        socket_server.bind((self.ipv4, self.pp2p))
+        socket_server.listen(5)
+        while 1:
+            print("Attesa connessione peer")
+            client, address = socket_server.accept()
+            new_pid = os.fork()
+            if new_pid == 0:
+                try:
+                    socket_server.close()
+                    while 1:
+                        stringa_ricevuta = client.recv(size)
+                        if stringa_ricevuta== "":
+                            print("\t\tempty socket")
+                            break
+                        operazione = stringa_ricevuta[0:4]
+                        #   send msg
+                        if operazione.upper() == "RETR":
+                            md5 = stringa_ricevuta[4:20]
+                            print ("\t\tdownload request from a peer, md5: %s" % md5)
+                            client.send("ARET" + "non so cosa scrivere")
+                except Exception as e:
+                    print e
+                    print("Errore ricezione")
+                finally:
+                    client.close()
+            else:
+                client.close()
+
+        print("Terminato server")
+
 
     #   method for receiving download request from the Peer by zotti
     # def accept(self):

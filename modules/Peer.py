@@ -35,7 +35,6 @@ class Peer(object):
     filesList = []
     number_share_files = 0
 
-
     def __init__(self):
         # Searching for shareable files
         for root, dirs, files in os.walk("shareable"):
@@ -53,24 +52,24 @@ class Peer(object):
         response_message = c.socketDirectory.recv(20)
         self.sessionId = response_message[4:20]
         if self.sessionId == '0000000000000000' or self.sessionId == '':
-            print "\tproblems with the login.\n\tPlease, try again."
+            print "problems with the login.\nPlease, try again."
         else:
-            print('sessionID assigned by the directory: ' + self.sessionId)
+            print "sessionID assigned by the directory: " + self.sessionId
         c.socketDirectory.close()
-        return self.sessionId
 
     def logout(self):
         # TODO: Log out
-        msg = ('LOGO' + self.sessionId)
-        print('message logout: ' + msg)
-        c = Connection.Connection(self.ipp2p)
+        msg = 'LOGO' + self.sessionId
+        print "message logout: " + msg
+        c = Connection.Connection(self.ipv4, self.ipv6)
         c.socketDirectory.send(msg)
         response_message = c.socketDirectory.recv(7)
         number_file = int(response_message[4:7])
         if number_file != self.number_share_files:
-            print('error number delete file')
+            print "error number delete file"
         self.sessionId = None
-        return
+        print "Logout completed"
+        c.socketDirectory.close()
 
     def share(self):
         print "Select a file to share"
@@ -94,7 +93,6 @@ class Peer(object):
                 print "after insert.."
                 print "files inside the directory: "+response[-3:]
                 print "done"
-
 
     def remove(self):
         print "Select a file to remove"
@@ -170,7 +168,6 @@ class Peer(object):
                 print "No results found for search term: " + term
             else:
                 print "Unknown error, check your code!"
-
     # self.download(availableFiles)
 
     #  availableFiles è una lista recuperata tramite la ricerca che contiene i risultati
