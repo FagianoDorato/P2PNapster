@@ -74,7 +74,7 @@ while 1:
                 response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
                 response += '03000'
                 response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
-                response += '03000'
+                response += '06531'
 
         conn.send(response)
 
@@ -88,6 +88,11 @@ while 1:
         print "received porta: " + str(port)
         print 'messaggio ricevuto da Peer: ' + 'AFIN' + '1234567891234567'
         response = 'AFIN' + '1234567891234567'
+        print response
+        conn.send(response)
+
+    elif cmd == "GREG":
+        response = 'ADRE' + '002'
         print response
         conn.send(response)
 
