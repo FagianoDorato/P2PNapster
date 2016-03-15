@@ -97,3 +97,24 @@ while 1:
         response = 'ALGO' + '003'
         print response
         conn.send(response)
+
+    elif cmd == 'RETR':
+        file_name = conn.recv(16)
+        print "Nome file dal client: ", file_name
+        if os.path.exists(file_name):
+            length = os.path.getsize(file_name)
+        length = os.stat(file_name).st_size
+        print "Lunghezza file", length
+        numChunks = length / 1024 + 1
+
+        strChunks = numChunks.zfill(6)
+        conn.send('ARET')
+        conn.send(strChunks)
+        with open(file_name, 'rb') as f:
+            l = f.read(1024)
+            while (l):
+                lenChunk = len(str(l))
+                strLenChunk = lenChunk.zfill(5)
+                conn.send(strLenChunk)
+                conn.send(l)
+                l = f.read(1024)
