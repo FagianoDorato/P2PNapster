@@ -79,7 +79,6 @@ def start_server(lista_file):
 
 
 def start_server_multithread():
-
     print "initializing server multithread"
     HOST = None            # Symbolic name meaning all available interfaces
     PORT = 3000              # Arbitrary non-privileged port

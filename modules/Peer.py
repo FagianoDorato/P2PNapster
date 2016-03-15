@@ -28,8 +28,8 @@ def fileExists(list, md5):
 
 class Peer(object):
     sessionId = None
-    ipv4 = "172.030.008.001"
-    ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
+    ipv4 = "172.030.008.002"
+    ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     ipp2p = ipv4 + ipv6
     port = "03000"
     response_message = None
@@ -198,4 +198,4 @@ class Peer(object):
             for idx2, owner in file.owners:
                 if option == idx2:
                     print "Downloading file..."
-                    download.get_file(owner.ipv4,owner.port,file.md5)
+                    download.get_file(owner.ipv4, owner.port, file.md5)

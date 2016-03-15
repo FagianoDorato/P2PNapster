@@ -3,7 +3,7 @@ from modules import Peer
 from modules import serverSocket
 import threading
 from multiprocessing import Process
-
+from modules import PeerServer
 # main
 p = Peer.Peer()
 
@@ -22,8 +22,8 @@ while p.sessionId is None:
         print 'Completed.'
 
         # TODO: Start peer server
-        #thread = threading.Thread(target=serverSocket.start_server_multithread)
-        #thread.start()
+        peerserver = PeerServer(p.ipv4, p.ipv6, p.port, p.filesList)
+        peerserver.start()
 
         while p.sessionId is not None:
             print "\n\nSelect one of the following options:"
