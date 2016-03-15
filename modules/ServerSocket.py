@@ -1,8 +1,11 @@
-import socket
+import socket, errno
 import os
 import sys
 from thread import *
 from multiprocessing import Process
+from thread import *
+import hashlib
+import base64
 
 def convert_to_string(no, numBytes):
     result = str(no)
@@ -12,30 +15,54 @@ def convert_to_string(no, numBytes):
         num += 1
     return result
 
+def hashfile(afile, hasher, blocksize=65536):
+    buf = afile.read(blocksize)
+    while len(buf) > 0:
+        hasher.update(buf)
+        buf = afile.read(blocksize)
+    return hasher.digest()
+
+
+
 def clientthread(conn):
-        #manca controllo lista per reperimento file da sharable
+        try:
+            cmd = conn.recv(4)
+            if cmd == 'RETR':
+                fileRemoteMd5 = conn.recv(16)
 
-        cmd = conn.recv(4)
-        if cmd == 'RETR':
-            file_name = conn.recv(16)
-            print "Nome file dal client: ", file_name
-            if os.path.exists(file_name):
-                length = os.path.getsize(file_name)
-            length = os.stat(file_name).st_size
-            print "Lunghezza file", length
-            numChunks = length / 1024 + 1
 
-            strChunks = convert_to_string(numChunks, 6)
-            conn.send('ARET')
-            conn.send(strChunks)
-            with open(file_name, 'rb') as f:
-                l = f.read(1024)
-                while (l):
-                    lenChunk = len(str(l))
-                    strLenChunk = convert_to_string(lenChunk, 5)
-                    conn.send(strLenChunk)
-                    conn.send(l)
-                    l = f.read(1024)
+            for root, dirs, files in os.walk("shareable"):
+                for file in files:
+                    fileMd5 = hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
+                    if fileRemoteMd5 == fileMd5:
+                        length = os.stat("shareable/" + file).st_size
+                        numChunks = length / 1024 + 1
+
+                        strChunks = convert_to_string(numChunks, 6)
+                        conn.send('ARET')
+                        conn.send(strChunks)
+                        with open("shareable/" + file, 'rb') as f:
+                            l = f.read(1024)
+                            while (l):
+                                lenChunk = len(str(l))
+                                strLenChunk = convert_to_string(lenChunk, 5)
+                                conn.send(strLenChunk)
+                                conn.send(l)
+                                l = f.read(1024)
+        except socket.error, e:
+            if isinstance(e.args, tuple):
+                print "errno is %d" % e[0]
+                if e[0] == errno.EPIPE:
+                   # remote peer disconnected
+                   print "Detected remote disconnect"
+                else:
+                   # determine and handle different error
+                   pass
+            else:
+                print "socket error ", e
+            conn.close()
+
+
 
 def start_server():
     #creo un nuvo processo in ascolto delle richieste dei peer
