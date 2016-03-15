@@ -33,7 +33,7 @@ class PeerServer(threading.Thread):
             conn, addr = self.peerserver_socket.accept()
             print 'Connected by', addr
 
-            peer = PeerHandler(conn, addr, self.fileList)
+            peer = PeerHandler.PeerHandler(conn, addr, self.fileList)
             peer.start()
 
         self.peerserver_socket.close()
