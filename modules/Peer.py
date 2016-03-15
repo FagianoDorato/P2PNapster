@@ -58,6 +58,8 @@ class Peer(object):
         else:
             print "sessionID assigned by the directory: " + self.sessionId
 
+        c.socketDirectory.close()
+
     def logout(self):
         # TODO: Log out
         msg = 'LOGO' + self.sessionId
@@ -74,7 +76,7 @@ class Peer(object):
         #    print "error number delete file"
         #self.sessionId = None
         #print "Logout completed"
-
+        c.socketDirectory.close()
 
     def share(self):
         print "Select a file to share"
@@ -86,19 +88,18 @@ class Peer(object):
             if idx == int(option):
                 print "Adding file " + file.name
                 # TODO: add file
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-                s.connect((dirIP, dir_port))
+                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
                 formatSend = 'ADDF' + self.sessionId + file.md5 + file.name.ljust(100)
-                s.send(formatSend)
+                c.socketDirectory.send(formatSend)
 
                 print formatSend
-                response=s.recv(7)
+                response=c.socketDirectory.recv(7)
                 print response
                 print "after insert.."
                 print "files inside the directory: "+response[-3:]
                 print "done"
 
+        c.socketDirectory.close()
 
     def remove(self):
         print "Select a file to remove"
@@ -110,14 +111,12 @@ class Peer(object):
             if idx == int(option):
                 print "Removing file " + file.name
                 # TODO: remove file
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-                s.connect((dirIP, dir_port))
+                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
                 formatSend = 'DELF' + self.sessionId + file.md5
-                s.send(formatSend)
+                c.socketDirectory.send(formatSend)
 
                 print formatSend
-                response=s.recv(7)
+                response = c.socketDirectory.recv(7)
                 print response
 
                 if response[-3:] == '999':
@@ -132,29 +131,27 @@ class Peer(object):
         term = raw_input()
         print "Searching files that match: " + term
         # TODO: search files
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        s.connect((dirIP, dir_port))
+        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
         cmd = 'FIND' + self.sessionId + term.ljust(20)
-        s.send(cmd)
+        c.socketDirectory.send(cmd)
 
-        r = s.recv(4)
+        r = c.socketDirectory.recv(4)
         if not r == 'AFIN':
             print "Error"
         else:
-            idmd5 = s.recv(3)
+            idmd5 = c.socketDirectory.recv(3)
             if idmd5 != 0:  # At least one result
                 availableFiles = []
 
                 for idx in range(0, int(idmd5)):
-                    file_i_md5 = s.recv(16)
-                    file_i_name = s.recv(100).strip()
-                    file_i_copies = s.recv(3)
+                    file_i_md5 = c.socketDirectory.recv(16)
+                    file_i_name = c.socketDirectoryrecv(100).strip()
+                    file_i_copies = c.socketDirectoryrecv(3)
                     file_owners = []
                     for copy in range(0, int(file_i_copies)):
-                        owner_j_ipv4 = s.recv(16).replace("|", "")  # ipv4
-                        owner_j_ipv6 = s.recv(39)  # ipv6
-                        owner_j_port = s.recv(5)  # port
+                        owner_j_ipv4 = c.socketDirectory.recv(16).replace("|", "")  # ipv4
+                        owner_j_ipv6 = c.socketDirectoryrecv(39)  # ipv6
+                        owner_j_port = c.socketDirectory.recv(5)  # port
                         file_owners.append(Owner(owner_j_ipv4, owner_j_ipv6, owner_j_port))
 
                     availableFiles.append(SharedFile(file_i_name, file_i_md5, file_owners))
