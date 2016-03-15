@@ -2,6 +2,7 @@ import socket
 import os
 import threading
 
+
 class PeerHandler(threading.Thread):
     conn = None
     addr = None
@@ -13,16 +14,16 @@ class PeerHandler(threading.Thread):
 
         self.conn = conn
         self.addr = addr
-        self.files = fileList
+        self.fileList = fileList
 
     def run(self):
 
         # TODO: gestire errori ed exception
         cmd = self.conn.recv(4)
-
+        print cmd
         if cmd == "RETR":
 
-            self.md5 = self.conn.retr(16)
+            self.md5 = self.conn.recv(16)
 
             found_name = None
 
@@ -36,7 +37,7 @@ class PeerHandler(threading.Thread):
             length = os.stat(found_name).st_size
             print "Lunghezza file", length
             numChunks = length / 1024 + 1
-            self.conn.send("ARET"+numChunks.zfill(6))
+            self.conn.send("ARET" + numChunks.zfill(6))
 
             with open(found_name, 'rb') as f:
                 l = f.read(1024)

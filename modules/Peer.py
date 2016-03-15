@@ -28,11 +28,11 @@ def fileExists(list, md5):
 
 class Peer(object):
     sessionId = None
-    my_ipv4 = "172.030.008.002"
-    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
-    my_port = "06500"
-    dir_ipv4 = "172.030.008.003"
-    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0003"
+    my_ipv4 = "172.030.008.003"
+    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0003"
+    my_port = "06530"
+    dir_ipv4 = "172.030.008.001"
+    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
     dir_ipp2p = dir_ipv4 + dir_ipv6
     dir_port = "03000"
     response_message = None
@@ -41,6 +41,7 @@ class Peer(object):
 
 
     def __init__(self):
+
         # Searching for shareable files
         for root, dirs, files in os.walk("shareable"):
             for file in files:
@@ -208,7 +209,7 @@ class Peer(object):
             if option == idx2:
                 print "Downloading file from: " + owner.ipv4 + " | " + owner.ipv6 + " " + owner.port
                 Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
-                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
-                Download.warns_directory(self.sessionId, file.md5, c)
+                #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+                #Download.warns_directory(self.sessionId, file.md5, c)
         
         c.socketDirectory.close()

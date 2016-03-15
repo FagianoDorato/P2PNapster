@@ -10,7 +10,7 @@ class PeerServer(threading.Thread):
     peerserver_ipv4 = None
     peerserver_ipv6 = None
     peerserver_port = None
-    filesList = None
+    fileList = None
     allow_run = True
 
     def __init__(self, ipv4, ipv6, port, fileList):
@@ -19,7 +19,7 @@ class PeerServer(threading.Thread):
         self.peerserver_ipv4 = ipv4
         self.peerserver_ipv6 = ipv6
         self.peerserver_port = port
-        self.filesList = fileList
+        self.fileList = fileList
 
     def run(self):
         self.peerserver_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,10 +35,9 @@ class PeerServer(threading.Thread):
 
                     peer = PeerHandler.PeerHandler(conn, addr, self.fileList)
                     peer.start()
-                except Exception:
-                    print "Error"
-                finally:
-                    conn.close()
+                except Exception,err:
+                    print "Error: "+Exception+" / " + err
+
         finally:
             conn.close()
 

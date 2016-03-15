@@ -71,7 +71,7 @@ while 1:
                 response += filemd5
                 response += filename
                 response += copies  # 2 copie
-                response += '172.030.008.001|fc00:0000:0000:0000:0000:0000:0008:0001'
+                response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
                 response += '03000'
                 response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
                 response += '03000'
