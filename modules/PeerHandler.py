@@ -9,6 +9,8 @@ class PeerHandler(threading.Thread):
     md5 = None
 
     def __init__(self, conn, addr, fileList):
+        threading.Thread.__init__(self)
+
         self.conn = conn
         self.addr = addr
         self.files = fileList
@@ -43,3 +45,7 @@ class PeerHandler(threading.Thread):
                     self.conn.send(lenChunk.zfill(5))
                     self.conn.send(l)
                     l = f.read(1024)
+
+            f.close()
+
+        self.conn.close()

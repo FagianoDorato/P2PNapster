@@ -13,7 +13,7 @@ class Connection:
     dir_ipv4 = None
     dir_port = None
     dir_ipv6 = None
-    boolean = random.randrange(0, 100) % 2
+    ip_selector = random.randrange(0, 100) % 2
     string_read = None
     size = 1024
     message_received = None
@@ -27,17 +27,17 @@ class Connection:
         #self.ipv6 = '::1'
         #print (self.dir_ipv4)
         #print (self.dir_ipv6)
-        if False:
-
+        if self.ip_selector == 0:
+            self.ip_selector = 1
             self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 self.socketDirectory.connect((self.dir_ipv4, self.dir_port))
                 #print ("\t--->Succesfully connected ipv4!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
-        #   case: ipv6
-        else:
 
+        else:  # case: ipv6
+            self.ip_selector = 0
             self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
                 self.socketDirectory.connect((self.dir_ipv6, self.dir_port))

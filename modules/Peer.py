@@ -61,6 +61,7 @@ class Peer(object):
         else:
             print "sessionID assigned by the directory: " + self.sessionId
 
+        
         c.socketDirectory.close()
 
     def logout(self):
@@ -78,8 +79,10 @@ class Peer(object):
         #if number_file != self.number_share_files:
         #    print "error number delete file"
         #self.sessionId = None
-        #print "Logout completed"
+
+        
         c.socketDirectory.close()
+        print "Logout completed"
 
     def share(self):
         print "Select a file to share"
@@ -100,6 +103,7 @@ class Peer(object):
                 print "after insert.."
                 print "files inside the directory: "+response[-3:]
 
+        
         c.socketDirectory.close()
 
     def remove(self):
@@ -126,6 +130,10 @@ class Peer(object):
                     print "after removing.."
                     print "files inside the directory: "+response[-3:]
                     print "done"
+
+        
+        c.socketDirectory.close()
+
 
     def search(self):
         print "Insert search term:"
@@ -174,6 +182,9 @@ class Peer(object):
                 print "No results found for search term: " + term
             else:
                 print "Unknown error, check your code!"
+
+        
+        c.socketDirectory.close()
     # self.download(availableFiles)
 
     #  availableFiles è una lista recuperata tramite la ricerca che contiene i risultati
@@ -195,7 +206,9 @@ class Peer(object):
         option = input()
         for idx2, owner in enumerate(file.owners):
             if option == idx2:
-                print "Downloading file..."
+                print "Downloading file from: " + owner.ipv4 + " | " + owner.ipv6 + " " + owner.port
                 Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
                 c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
                 Download.warns_directory(self.sessionId, file.md5, c)
+        
+        c.socketDirectory.close()
