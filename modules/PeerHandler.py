@@ -2,7 +2,6 @@ import socket
 import os
 import threading
 
-
 class PeerHandler(threading.Thread):
     conn = None
     addr = None

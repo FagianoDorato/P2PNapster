@@ -28,20 +28,20 @@ def fileExists(list, md5):
 
 class Peer(object):
     sessionId = None
-    my_ipv4 = "172.030.008.003"
-    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0003"
-    my_port = "06530"
-    dir_ipv4 = "172.030.008.001"
-    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
+    my_ipv4 = "172.030.008.002"
+    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
+    my_port = "06500"
+    dir_ipv4 = "172.030.001.003"
+    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0001:0003"
     dir_ipp2p = dir_ipv4 + dir_ipv6
     dir_port = "03000"
     response_message = None
     filesList = []
     number_share_files = 0
+    socket = None
 
 
     def __init__(self):
-
         # Searching for shareable files
         for root, dirs, files in os.walk("shareable"):
             for file in files:
@@ -52,18 +52,16 @@ class Peer(object):
     def login(self):
         # TODO: Log in and return sessionId
         msg = ('LOGI' + self.my_ipv4 + '|' + self.my_ipv6 + self.my_port)
-        print('messaaggio login: ' + msg)
-        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
-        c.socketDirectory.send(msg)
-        response_message = c.socketDirectory.recv(20)
+        print('messaggio login: ' + msg)
+        self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+        self.socket.socketDirectory.send(msg)
+        response_message = self.socket.socketDirectory.recv(20)
         self.sessionId = response_message[4:20]
         if self.sessionId == '0000000000000000' or self.sessionId == '':
             print "problems with the login.\nPlease, try again."
         else:
             print "sessionID assigned by the directory: " + self.sessionId
-
-        
-        c.socketDirectory.close()
+        #c.socketDirectory.close()
 
     def logout(self):
         # TODO: Log out
@@ -141,27 +139,27 @@ class Peer(object):
         term = raw_input()
         print "Searching files that match: " + term
         # TODO: search files
-        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+        #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
         cmd = 'FIND' + self.sessionId + term.ljust(20)
-        c.socketDirectory.send(cmd)
+        self.socket.socketDirectory.send(cmd)
 
-        r = c.socketDirectory.recv(4)
+        r = self.socket.socketDirectory.recv(4)
         if not r == 'AFIN':
             print "Error"
         else:
-            idmd5 = c.socketDirectory.recv(3)
+            idmd5 = self.socket.socketDirectory.recv(3)
             if idmd5 != 0:  # At least one result
                 availableFiles = []
 
                 for idx in range(0, int(idmd5)):
-                    file_i_md5 = c.socketDirectory.recv(16)
-                    file_i_name = c.socketDirectory.recv(100).strip()
-                    file_i_copies = c.socketDirectory.recv(3)
+                    file_i_md5 = self.socket.socketDirectory.recv(16)
+                    file_i_name = self.socket.socketDirectory.recv(100).strip()
+                    file_i_copies = self.socket.socketDirectory.recv(3)
                     file_owners = []
                     for copy in range(0, int(file_i_copies)):
-                        owner_j_ipv4 = c.socketDirectory.recv(16).replace("|", "")  # ipv4
-                        owner_j_ipv6 = c.socketDirectory.recv(39)  # ipv6
-                        owner_j_port = c.socketDirectory.recv(5)  # port
+                        owner_j_ipv4 = self.socket.socketDirectory.recv(16).replace("|", "")  # ipv4
+                        owner_j_ipv6 = self.socket.socketDirectory.recv(39)  # ipv6
+                        owner_j_port = self.socket.socketDirectory.recv(5)  # port
                         file_owners.append(Owner(owner_j_ipv4, owner_j_ipv6, owner_j_port))
 
                     availableFiles.append(SharedFile(file_i_name, file_i_md5, file_owners))
@@ -177,7 +175,29 @@ class Peer(object):
                         print "ipv6: " + str(owner.ipv6)
                         print "port: " + str(owner.port)
 
-                self.download(availableFiles)
+                #self.download(availableFiles)
+
+                # visualizza i risultati della ricerca
+                print "Select a file to download: "
+                for idx, file in enumerate(availableFiles):
+                    print str(idx) + ": " + file.name
+                # seleziona un file da scaricare
+                option = input()
+
+                # visualizza la lista dei peer da cui è possibile scaricarlo
+                print "Select a peer: "
+                for idx, file in enumerate(availableFiles):
+                    if option == idx:
+                        for idx2, owner in enumerate(file.owners):
+                            print str(idx2) + ": " + owner.ipv4 + " | " + owner.ipv6 + " | " + owner.port
+
+                option = input()
+                for idx2, owner in enumerate(file.owners):
+                    if option == idx2:
+                        print "Downloading file from: " + owner.ipv4 + " | " + owner.ipv6 + " " + owner.port
+                        Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
+                        #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+                        #Download.warns_directory(self.sessionId, file.md5, c)
 
             elif idmd5 == 0:
                 print "No results found for search term: " + term
@@ -185,10 +205,11 @@ class Peer(object):
                 print "Unknown error, check your code!"
 
         
-        c.socketDirectory.close()
+        #c.socketDirectory.close()
     # self.download(availableFiles)
 
-    #  availableFiles è una lista recuperata tramite la ricerca che contiene i risultati
+
+    '''#  availableFiles è una lista recuperata tramite la ricerca che contiene i risultati
     def download(self, availableFiles):
         # visualizza i risultati della ricerca
         print "Select a file to download: "
@@ -212,4 +233,4 @@ class Peer(object):
                 #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
                 #Download.warns_directory(self.sessionId, file.md5, c)
         
-        c.socketDirectory.close()
+        c.socketDirectory.close()'''
