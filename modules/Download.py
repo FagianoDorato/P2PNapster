@@ -52,5 +52,12 @@ def get_file(hostIpv4, hostIpv6, port, file):
     s.close()
     return "OK"
 
-def warns_directory(sessionId, file_md5):
-    pass
+def warns_directory(sessionId, file_md5, connToDir):
+    cmd = 'GREG' + sessionId + file_md5
+    connToDir.socketDirectory.sendall(cmd)
+    res_msg = connToDir.soketDirectory.recv(14)
+    numDown = int(res_msg[4:14])
+    if res_msg[0:3] == 'ADRE' and isinstance( numDown, int ):
+        return 'Gli altri peer hanno scaricato ', numDown, ' copie dello stesso file!'
+    else:
+        return 'Errore nella risposta dalla directory!'

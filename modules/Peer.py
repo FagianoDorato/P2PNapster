@@ -199,4 +199,5 @@ class Peer(object):
                 if option == idx2:
                     print "Downloading file..."
                     Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
-                    Download.warns_directory(self.sessionId, file.md5)
+                    c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
+                    Download.warns_directory(self.sessionId, file.md5, c)
