@@ -11,6 +11,7 @@ class PeerServer(threading.Thread):
     peerserver_ipv6 = None
     peerserver_port = None
     filesList = None
+    stop = False
 
     def __init__(self, ipv4, ipv6, port, fileList):
         threading.Thread.__init__(self)
@@ -28,7 +29,7 @@ class PeerServer(threading.Thread):
 
         self.peerserver_socket.listen(5)
 
-        while True:
+        while not self.stop:
             conn, addr = self.peerserver_socket.accept()
             print 'Connected by', addr
 

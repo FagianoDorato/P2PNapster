@@ -43,5 +43,6 @@ while p.sessionId is None:
             elif option == 4:
                 p.logout()
                 # TODO: stop peer server
+                peerserver.stop = True
             else:
                 print str(option) + " not recognized as a command"

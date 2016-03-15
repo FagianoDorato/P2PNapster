@@ -36,7 +36,8 @@ def get_file(hostIpv4, hostIpv6, port, file):
         return "Error ARET from Peer"
     numChunks = int(s.recv(6))
 
-    f = open('shareable/' + file.name, 'wb')
+    f = open('received/' + file.name, 'wb')
+    #   f = open('shareable/' + file.name, 'wb')
     recvd = ''
     while numChunks > 0:
         print '',numChunks
