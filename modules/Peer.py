@@ -67,9 +67,9 @@ class Peer(object):
         # TODO: Log out
         msg = 'LOGO' + self.sessionId
         print "message logout: " + msg
-        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
-        c.socketDirectory.send(msg)
-        cmd = c.socketDirectory.recv(4)
+        #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+        self.socket.socketDirectory.send(msg)
+        cmd = self.socket.socketDirectory.recv(4)
         if not cmd:
             print "error"
         if cmd == "ALGO":
@@ -78,9 +78,8 @@ class Peer(object):
         #if number_file != self.number_share_files:
         #    print "error number delete file"
         #self.sessionId = None
-
         
-        c.socketDirectory.close()
+        self.socket.socketDirectory.close()
         print "Logout completed"
 
     def share(self):
@@ -93,17 +92,17 @@ class Peer(object):
             if idx == int(option):
                 print "Adding file " + file.name
                 # TODO: add file
-                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+                #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
                 formatSend = 'ADDF' + self.sessionId + file.md5 + file.name.ljust(100)
                 print formatSend
-                c.socketDirectory.send(formatSend)
-                response = c.socketDirectory.recv(7)
+                self.socket.socketDirectory.send(formatSend)
+                response = self.socket.socketDirectory.recv(7)
                 print response
                 print "after insert.."
                 print "files inside the directory: "+response[-3:]
 
         
-        c.socketDirectory.close()
+        #.socketDirectory.close()
 
     def remove(self):
         print "Select a file to remove"
@@ -115,12 +114,12 @@ class Peer(object):
             if idx == int(option):
                 print "Removing file " + file.name
                 # TODO: remove file
-                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+                #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
                 formatSend = 'DELF' + self.sessionId + file.md5
-                c.socketDirectory.send(formatSend)
+                self.socket.socketDirectory.send(formatSend)
 
                 print formatSend
-                response = c.socketDirectory.recv(7)
+                response = self.socket.socketDirectory.recv(7)
                 print response
 
                 if response[-3:] == '999':
@@ -130,8 +129,7 @@ class Peer(object):
                     print "files inside the directory: "+response[-3:]
                     print "done"
 
-        
-        c.socketDirectory.close()
+
 
 
     def search(self):
