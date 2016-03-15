@@ -9,7 +9,7 @@ import Connection
 import base64
 
 dirIP = '127.0.0.1'
-port = 3000
+dir_port = 3000
 
 # Helper Methods
 def hashfile(afile, hasher, blocksize=65536):
@@ -28,10 +28,10 @@ def fileExists(list, md5):
 
 class Peer(object):
     sessionId = None
-    ipv4 = "172.030.008.002"
-    ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
-    ipp2p = ipv4 + ipv6
-    port = "03000"
+    dir_ipv4 = "172.030.008.001"
+    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
+    dir_ipp2p = dir_ipv4 + dir_ipv6
+    dir_port = "03000"
     response_message = None
     filesList = []
     number_share_files = 0
@@ -47,9 +47,9 @@ class Peer(object):
 
     def login(self):
         # TODO: Log in and return sessionId
-        msg = ('LOGI' + self.ipv4 + '|' + self.ipv6 + self.port)
+        msg = ('LOGI' + self.dir_ipv4 + '|' + self.dir_ipv6 + self.port)
         print('messaaggio login: ' + msg)
-        c = Connection.Connection(self.ipv4, self.ipv6, int(self.port))
+        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
         c.socketDirectory.send(msg)
         response_message = c.socketDirectory.recv(20)
         self.sessionId = response_message[4:20]
@@ -62,7 +62,7 @@ class Peer(object):
         # TODO: Log out
         msg = 'LOGO' + self.sessionId
         print "message logout: " + msg
-        c = Connection.Connection(self.ipv4, self.ipv6, int(self.port))
+        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
         c.socketDirectory.send(msg)
         cmd = c.socketDirectory.recv(4)
         if not cmd:
@@ -88,7 +88,7 @@ class Peer(object):
                 # TODO: add file
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-                s.connect((dirIP, port))
+                s.connect((dirIP, dir_port))
                 formatSend = 'ADDF' + self.sessionId + file.md5 + file.name.ljust(100)
                 s.send(formatSend)
 
@@ -112,7 +112,7 @@ class Peer(object):
                 # TODO: remove file
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-                s.connect((dirIP, port))
+                s.connect((dirIP, dir_port))
                 formatSend = 'DELF' + self.sessionId + file.md5
                 s.send(formatSend)
 
@@ -134,7 +134,7 @@ class Peer(object):
         # TODO: search files
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        s.connect((dirIP, port))
+        s.connect((dirIP, dir_port))
         cmd = 'FIND' + self.sessionId + term.ljust(20)
         s.send(cmd)
 

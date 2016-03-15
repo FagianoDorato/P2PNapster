@@ -22,7 +22,7 @@ while p.sessionId is None:
         print 'Completed.'
 
         # TODO: Start peer server
-        peerserver = PeerServer(p.ipv4, p.ipv6, p.port, p.filesList)
+        peerserver = PeerServer(p.dir_ipv4, p.dir_ipv6, p.port, p.filesList)
         peerserver.start()
 
         while p.sessionId is not None:
