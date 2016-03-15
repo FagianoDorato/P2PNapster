@@ -14,17 +14,38 @@ def hashfile(afile, hasher, blocksize=65536):
     return hasher.digest()
 
 
-TCP_IP = '127.0.0.1'
+#TCP_IP = '172.30.8.1'#'127.0.0.1'
+#TCP_IP = 'fc00::8:1'
+TCP_IP = None
 TCP_PORT = 3000
 BUFFER_SIZE = 20
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT))
-s.listen(1)
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.bind((TCP_IP, TCP_PORT))
+# s.listen(1)
+#
+# conn, addr = s.accept()
+for res in socket.getaddrinfo(TCP_IP, TCP_PORT, socket.AF_UNSPEC, socket.SOCK_STREAM, 0, socket.AI_PASSIVE):
+    af, socktype, proto, canonname, sa = res
+    try:
+        s = socket.socket(af, socktype, proto)
+    except socket.error as msg:
+        s = None
+        continue
+    try:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind(sa)
+        s.listen(5)
 
+    except socket.error as msg:
+        s.close()
+        s = None
+        continue
+    break
+#print 'Connection address:', addr
 while 1:
     conn, addr = s.accept()
-    print 'Connection address:', addr
+    print 'Connected by', addr
     cmd = conn.recv(4)
 
     if cmd == "FIND":

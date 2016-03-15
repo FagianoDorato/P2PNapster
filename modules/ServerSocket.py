@@ -12,11 +12,10 @@ def convert_to_string(no, numBytes):
         num += 1
     return result
 
-def clientthread(conn, lista_file):
+def clientthread(conn):
         #manca controllo lista per reperimento file da sharable
 
         cmd = conn.recv(4)
-
         if cmd == 'RETR':
             file_name = conn.recv(16)
             print "Nome file dal client: ", file_name
@@ -38,14 +37,14 @@ def clientthread(conn, lista_file):
                     conn.send(l)
                     l = f.read(1024)
 
-def start_server(lista_file):
+def start_server():
     #creo un nuvo processo in ascolto delle richieste dei peer
     newpid = os.fork()
     if newpid == 0:              #sono nel processo figlio
         HOST = None               # Symbolic name meaning all available interfaces
         PORT = 3000              # Arbitrary non-privileged port
         s = None
-        for res in socket.getaddrinfo(HOST, PORT, socket.AF_UNSPEC,
+        for res in socket.getaddrinfo(HOST, PORT, socket.AF_INET6,
                                       socket.SOCK_STREAM, 0, socket.AI_PASSIVE):
             af, socktype, proto, canonname, sa = res
             try:
@@ -71,11 +70,11 @@ def start_server(lista_file):
             conn, addr = s.accept()
             print 'Connected by', addr
 
-            #start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
-            start_new_thread(clientthread ,(conn, lista_file))
+            #start new thread takes 1st argument as a function name to be run
+            start_new_thread(clientthread ,(conn,))
         s.close()
     else:
-        return "Server inizializzato!"
+        return newpid #per chiudere il processo del server al logout
 
 
 def start_server_multithread():
