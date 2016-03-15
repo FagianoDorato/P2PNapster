@@ -31,8 +31,8 @@ class Peer(object):
     my_ipv4 = "172.030.008.002"
     my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     my_port = "06500"
-    dir_ipv4 = "172.030.008.005"
-    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0005"
+    dir_ipv4 = "172.030.008.001"
+    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
     dir_ipp2p = dir_ipv4 + dir_ipv6
     dir_port = "03000"
     response_message = None
@@ -50,9 +50,9 @@ class Peer(object):
 
     def login(self):
         # TODO: Log in and return sessionId
-        msg = ('LOGI' + self.my_ipv4 + '|' + self.my_ipv4 + self.my_port)
+        msg = ('LOGI' + self.my_ipv4 + '|' + self.my_ipv6 + self.my_port)
         print('messaaggio login: ' + msg)
-        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
+        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
         c.socketDirectory.send(msg)
         response_message = c.socketDirectory.recv(20)
         self.sessionId = response_message[4:20]
@@ -67,7 +67,7 @@ class Peer(object):
         # TODO: Log out
         msg = 'LOGO' + self.sessionId
         print "message logout: " + msg
-        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
+        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
         c.socketDirectory.send(msg)
         cmd = c.socketDirectory.recv(4)
         if not cmd:
@@ -91,16 +91,14 @@ class Peer(object):
             if idx == int(option):
                 print "Adding file " + file.name
                 # TODO: add file
-                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
+                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
                 formatSend = 'ADDF' + self.sessionId + file.md5 + file.name.ljust(100)
-                c.socketDirectory.send(formatSend)
-
                 print formatSend
-                response=c.socketDirectory.recv(7)
+                c.socketDirectory.send(formatSend)
+                response = c.socketDirectory.recv(7)
                 print response
                 print "after insert.."
                 print "files inside the directory: "+response[-3:]
-                print "done"
 
         c.socketDirectory.close()
 
@@ -114,7 +112,7 @@ class Peer(object):
             if idx == int(option):
                 print "Removing file " + file.name
                 # TODO: remove file
-                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
+                c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
                 formatSend = 'DELF' + self.sessionId + file.md5
                 c.socketDirectory.send(formatSend)
 
@@ -134,7 +132,7 @@ class Peer(object):
         term = raw_input()
         print "Searching files that match: " + term
         # TODO: search files
-        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
+        c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
         cmd = 'FIND' + self.sessionId + term.ljust(20)
         c.socketDirectory.send(cmd)
 
@@ -148,12 +146,12 @@ class Peer(object):
 
                 for idx in range(0, int(idmd5)):
                     file_i_md5 = c.socketDirectory.recv(16)
-                    file_i_name = c.socketDirectoryrecv(100).strip()
-                    file_i_copies = c.socketDirectoryrecv(3)
+                    file_i_name = c.socketDirectory.recv(100).strip()
+                    file_i_copies = c.socketDirectory.recv(3)
                     file_owners = []
                     for copy in range(0, int(file_i_copies)):
                         owner_j_ipv4 = c.socketDirectory.recv(16).replace("|", "")  # ipv4
-                        owner_j_ipv6 = c.socketDirectoryrecv(39)  # ipv6
+                        owner_j_ipv6 = c.socketDirectory.recv(39)  # ipv6
                         owner_j_port = c.socketDirectory.recv(5)  # port
                         file_owners.append(Owner(owner_j_ipv4, owner_j_ipv6, owner_j_port))
 
@@ -191,13 +189,12 @@ class Peer(object):
         print "Select a peer: "
         for idx, file in enumerate(availableFiles):
             if option == idx:
-                for idx2, owner in file.owners:
+                for idx2, owner in enumerate(file.owners):
                     print str(idx2) + ": " + owner.ipv4 + " | " + owner.ipv6 + " | " + owner.port
 
-            option = input()
-            for idx2, owner in file.owners:
-                if option == idx2:
-                    print "Downloading file..."
-                    Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
-                    c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
-                    Download.warns_directory(self.sessionId, file.md5, c)
+        option = input()
+        for idx2, owner in enumerate(file.owners):
+            if option == idx2:
+                print "Downloading file..."
+                Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
+                Download.warns_directory(self.sessionId, file.md5)

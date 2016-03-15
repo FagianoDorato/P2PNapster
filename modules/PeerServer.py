@@ -18,14 +18,13 @@ class PeerServer(threading.Thread):
         self.peerserver_ipv4 = ipv4
         self.peerserver_ipv6 = ipv6
         self.peerserver_port = port
-        # fileList è la lista di file disponibili da Peer
         self.filesList = fileList
 
 
     def run(self):
 
         self.peerserver_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.peerserver_socket.bind((self.peerserver_ipv4, self.peerserver_port))
+        self.peerserver_socket.bind((self.peerserver_ipv4, int(self.peerserver_port)))
 
         self.peerserver_socket.listen(5)
 
