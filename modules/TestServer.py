@@ -17,6 +17,7 @@ def hashfile(afile, hasher, blocksize=65536):
 #TCP_IP = '172.30.8.1'#'127.0.0.1'
 #TCP_IP = 'fc00::8:1'
 TCP_IP = None
+#TCP_IP = '::1'
 TCP_PORT = 3000
 BUFFER_SIZE = 20
 
@@ -67,7 +68,6 @@ while 1:
                 filemd5 = hashfile(open("../shareable/" + file, 'rb'), hashlib.md5())
                 filename = file.ljust(100)
                 copies = str(2).zfill(3)
-                print copies
                 response += filemd5
                 response += filename
                 response += copies  # 2 copie
@@ -86,6 +86,7 @@ while 1:
         print "received ipv6: " + str(ipv6)
         port = conn.recv(5)
         print "received porta: " + str(port)
+        print 'messaggio ricevuto da Peer: ' + 'AFIN' + '1234567891234567'
         response = 'AFIN' + '1234567891234567'
         print response
         conn.send(response)
@@ -95,6 +96,16 @@ while 1:
         sessionid = conn.recv(16)
         print "peer: " + sessionid
         response = 'ALGO' + '003'
+        print response
+        conn.send(response)
+
+    elif cmd == 'ADDF':
+        response = 'RADD' + '003'
+        print response
+        conn.send(response)
+
+    elif cmd == 'DELF':
+        response = 'RDEL' + '003'
         print response
         conn.send(response)
 

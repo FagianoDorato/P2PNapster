@@ -20,8 +20,10 @@ class Connection:
 
     #   ip: string ipv6 + ipv4
     def __init__(self, ipv4, ipv6, port):
-        self.dir_ipv4 = ipv4
-        self.dir_ipv6 = ipv6
+        #self.dir_ipv4 = ipv4
+        #self.dir_ipv6 = ipv6
+        #self.dir_ipv4 = ipv4
+        #self.dir_ipv6 = ipv6
         self.dir_port = port
         #self.ipv4 = '127.0.0.1'
         #self.ipv6 = '::1'
