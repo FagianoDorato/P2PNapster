@@ -28,8 +28,11 @@ def fileExists(list, md5):
 
 class Peer(object):
     sessionId = None
-    dir_ipv4 = "172.030.008.001"
-    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0001"
+    my_ipv4 = "172.030.008.002"
+    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
+    my_port = "06500"
+    dir_ipv4 = "172.030.008.005"
+    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0005"
     dir_ipp2p = dir_ipv4 + dir_ipv6
     dir_port = "03000"
     response_message = None
@@ -47,7 +50,7 @@ class Peer(object):
 
     def login(self):
         # TODO: Log in and return sessionId
-        msg = ('LOGI' + self.dir_ipv4 + '|' + self.dir_ipv6 + self.port)
+        msg = ('LOGI' + self.my_ipv4 + '|' + self.my_ipv4 + self.my_port)
         print('messaaggio login: ' + msg)
         c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.port))
         c.socketDirectory.send(msg)
