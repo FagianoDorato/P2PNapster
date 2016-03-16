@@ -28,8 +28,8 @@ def fileExists(list, md5):
 
 class Peer(object):
     sessionId = None
-    my_ipv4 = "172.030.008.003"
-    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0003"
+    my_ipv4 = "172.030.008.002"
+    my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     my_port = "06000"
     dir_ipv4 = "172.030.008.004"
     dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0004"
@@ -163,16 +163,16 @@ class Peer(object):
 
                     availableFiles.append(SharedFile(file_i_name, file_i_md5, file_owners))
 
-                print "Files matching the search term: "
-                for file in availableFiles:
-                    print "\n\nname: " + file.name
-                    print "md5: " + base64.encodestring(file.md5)
-
-                    for idx, owner in enumerate(file.owners):
-                        print "Owner " + str(idx)
-                        print "ipv4: " + str(owner.ipv4)
-                        print "ipv6: " + str(owner.ipv6)
-                        print "port: " + str(owner.port)
+                # print "Files matching the search term: "
+                # for file in availableFiles:
+                #     print "\n\nname: " + file.name
+                #     print "md5: " + base64.encodestring(file.md5)
+                #
+                #     for idx, owner in enumerate(file.owners):
+                #         print "Owner " + str(idx)
+                #         print "ipv4: " + str(owner.ipv4)
+                #         print "ipv6: " + str(owner.ipv6)
+                #         print "port: " + str(owner.port)
 
                 #self.download(availableFiles)
 

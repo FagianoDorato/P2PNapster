@@ -35,6 +35,7 @@ class Connection:
                 #print ("\t--->Succesfully connected ipv4!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
+                print self.dir_ipv4 + str(self.dir_port)
 
         else:  # case: ipv6
             self.ip_selector = 0
@@ -44,4 +45,5 @@ class Connection:
                 #print ("\t--->Succesfully connected ipv6!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
+                print self.dir_ipv4 + str(self.dir_port)
 
