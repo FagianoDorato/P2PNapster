@@ -62,7 +62,7 @@ class PeerHandler(threading.Thread):
             #         l = f.read(1024)
             #
             # f.close()
-            chunk_dim = 1024
+            chunk_dim = 2048
             try :
                 file = open("shareable/" + found_name, "rb")
             except Exception,expt:
@@ -104,5 +104,5 @@ class PeerHandler(threading.Thread):
                     #print "ho chiuso il file" #TODO debug
                 except EOFError:
                     print "You have read a EOF char"
-
+        self.conn.shutdown(socket.SHUT_WR)
         self.conn.close()

@@ -4,19 +4,11 @@ import SharedFile
 import os
 import hashlib
 from random import randint
-
-
-def hashfile(afile, hasher, blocksize=65536):
-    buf = afile.read(blocksize)
-    while len(buf) > 0:
-        hasher.update(buf)
-        buf = afile.read(blocksize)
-    return hasher.digest()
-
+import md5
 
 #TCP_IP = '172.30.8.1'#'127.0.0.1'
 #TCP_IP = 'fc00::8:1'
-TCP_IP = None
+#TCP_IP = "127.0.0.1"
 #TCP_IP = '::1'
 TCP_PORT = 3000
 BUFFER_SIZE = 20
@@ -65,14 +57,14 @@ while 1:
 
         for root, dirs, files in os.walk("../shareable"):
             for file in files:
-                filemd5 = hashfile(open("../shareable/" + file, 'rb'), hashlib.md5())
+                filemd5 = md5.hashfile(open("../shareable/" + file, 'rb'), hashlib.md5())
                 filename = file.ljust(100)
                 copies = str(2).zfill(3)
                 response += filemd5
                 response += filename
                 response += copies  # 2 copie
-                response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
-                response += '03000'
+                response += '127.000.000.001|fc00:0000:0000:0000:0000:0000:0000:0001'
+                response += '06000'
                 response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
                 response += '06600'
 
@@ -86,8 +78,8 @@ while 1:
         print "received ipv6: " + str(ipv6)
         port = conn.recv(5)
         print "received porta: " + str(port)
-        print 'messaggio ricevuto da Peer: ' + 'AFIN' + '1234567891234567'
-        response = 'AFIN' + '1234567891234567'
+        print 'messaggio ricevuto da Peer: ' + ipv4 + ' | ' + ipv6 + ' | ' + port
+        response = 'ALGI' + '1234567891234567'
         print response
         conn.send(response)
 
@@ -115,11 +107,11 @@ while 1:
         conn.send(response)
 
     elif cmd == 'RETR':
-        fileRemoteMd5 = conn.recv(16)
+        fileRemoteMd5 = conn.recv(32)
 
         for root, dirs, files in os.walk("shareable"):
             for file in files:
-                fileMd5 = hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
+                fileMd5 = md5.hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
                 if fileRemoteMd5 == fileMd5:
                     print "Nome file dal client: ", file.name
                     if os.path.exists(file.name):

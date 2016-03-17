@@ -27,7 +27,7 @@ class Connection:
         #self.ipv6 = '::1'
         #print (self.dir_ipv4)
         #print (self.dir_ipv6)
-        if self.ip_selector == 0:
+        if True:
             self.ip_selector = 1
             self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:

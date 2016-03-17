@@ -92,6 +92,7 @@ def get_file(hostIpv4, hostIpv6, port, file):
 
 def get_file2(hostIpv4, hostIpv6, port, file):
 
+    # TODO: scegliere a random ipv4 e ipv6
     iodown_host = hostIpv4
     iodown_port = int(port)
     iodown_addr = (iodown_host, iodown_port)
@@ -122,8 +123,9 @@ def get_file2(hostIpv4, hostIpv6, port, file):
 
                 num_chunk = ack[4:10]
 
-
-                fout = open('received/' + file.name, "ab") #a di append, b di binary mode
+                #filename = file.name
+                filename = "cisco.pdf"
+                fout = open('received/' + filename, "ab") #a di append, b di binary mode
 
 
                 #pulisco il numero di chunks dagli 0
@@ -132,55 +134,58 @@ def get_file2(hostIpv4, hostIpv6, port, file):
                 #print "The number of chunks is " + num_chunk_clean + "\n"
                 recvd = ''
 
-                rsock, _, _= select.select([iodown_socket], [], [])
+                #rsock, _, _= select.select([iodown_socket], [], [])
 
-                if rsock:
-                    rsock = rsock[0]
-                    for i in range (0,int(num_chunk_clean)): #i e' il numero di chunk
-                        print int(i)
+                data = []
+                datalength = []
+                #if rsock:
+                    #rsock = rsock[0]
+                rsock = iodown_socket
+                for i in range(0,int(num_chunk_clean)): #i e' il numero di chunk
+                    print int(i)
 
 
-                        #print "Watching chunk number " + str(int(i+1))
+                    #print "Watching chunk number " + str(int(i+1))
+
+                    #devo leggere altri byte ora
+                    #ne leggo 5 perche' 5 sono quelli che mi diranno poi quanto e' lungo il chunk
+                    try:
+
+                        #lungh_form = iodown_socket.recv(5) #ricevo lunghezza chunck formattata
+                        #lungh_form = rsock.recv(5)
+                        #print lungh_form
+                        datalength.append(recvall2(rsock, 5))
+                        lungh = int(datalength[-1]) #converto in intero
+                        print lungh
 
                         #devo leggere altri byte ora
-                        #ne leggo 5 perche' 5 sono quelli che mi diranno poi quanto e' lungo il chunk
-                        try:
+                        #ne leggo lungh perche' quella e' proprio la lunghezza del chunk
 
-                            #lungh_form = iodown_socket.recv(5) #ricevo lunghezza chunck formattata
-                            lungh_form = recvall(rsock,5)
-                            #print lungh_form
+                        #data = iodown_socket.recv(lungh)
+                        data.append(recvall2(rsock, lungh))
+                        '''while len(data) < int(lungh_form):
+                            data_overflow = iodown_socket.recv(int(lungh_form) - len(data))
+                            data += data_overflow'''
+                        #time.sleep(0.005)
 
-                            lungh = int(lungh_form) #converto in intero
-                            #print lungh
+                        #print "ho ricevuto i byte" #TODO debug mode
 
-                            #devo leggere altri byte ora
-                            #ne leggo lungh perche' quella e' proprio la lunghezza del chunk
+                        #recvd += data
+                        #lo devo mettere sul mio file che ho nel mio pc
 
-                            #data = iodown_socket.recv(lungh)
-                            data = recvall(rsock, lungh)
-                            '''while len(data) < int(lungh_form):
-                                data_overflow = iodown_socket.recv(int(lungh_form) - len(data))
-                                data += data_overflow'''
-                            #time.sleep(0.005)
+                        #fout.write(data) #scrivo sul file in append
 
-                            #print "ho ricevuto i byte" #TODO debug mode
+                        #print ""
 
-                            recvd += data
-                            #lo devo mettere sul mio file che ho nel mio pc
+                    except IOError, expt:
 
-                            #fout.write(data) #scrivo sul file in append
-
-                            #print ""
-
-                        except IOError, expt:
-
-                            print "Connection or File-access error -> %s" % expt
-                            break
-                    #ho finito di ricevere il file
-
-                    fout.write(recvd)
-                    fout.close()
-                    print "finito di scrivere!" #chiudo il file perche' ho finito di scaricarlo
+                        print "Connection or File-access error -> %s" % expt
+                        break
+                #ho finito di ricevere il file
+                result = b''.join(data)
+                fout.write(result)
+                fout.close()
+                print "finito di scrivere!" #chiudo il file perche' ho finito di scaricarlo
 
 
 def warns_directory(sessionId, file_md5, connToDir):

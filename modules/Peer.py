@@ -6,25 +6,11 @@ import Download
 import hashlib
 import socket
 import Connection
+import md5
 import base64
 
 dirIP = '127.0.0.1'
 dir_port = 3000
-
-# Helper Methods
-def hashfile(afile, hasher, blocksize=65536):
-    buf = afile.read(blocksize)
-    while len(buf) > 0:
-        hasher.update(buf)
-        buf = afile.read(blocksize)
-    return hasher.digest()
-
-
-def fileExists(list, md5):
-    for l in list:
-        if l.md5.lower() == md5.lower():
-            return True
-
 
 class Peer(object):
     sessionId = None
@@ -42,10 +28,12 @@ class Peer(object):
 
 
     def __init__(self):
+        self.dir_ipv4 = "127.0.0.1"
+        self.dir_ipv6 = "fc00::1"
         # Searching for shareable files
         for root, dirs, files in os.walk("shareable"):
             for file in files:
-                fileMd5 = hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
+                fileMd5 = md5.hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
                 newFile = SharedFile(file, fileMd5)
                 self.filesList.append(newFile)
 
@@ -59,12 +47,10 @@ class Peer(object):
             # Debug
             #response_message = 'ALGI1234567890123456'
 
-            #   self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+            self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
             self.socket.socketDirectory.send(msg)
             print 'Message sent, waiting for response...'
             response_message = self.socket.socketDirectory.recv(20)
-        except socket.error as e:
-            print 'Socket Error: ' + e.message
         except Exception as e:
             print 'Error: ' + e.message
 
@@ -82,7 +68,12 @@ class Peer(object):
         print 'Logging out...'
         msg = 'LOGO' + self.sessionId
         print "message logout: " + msg
-        #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+        # TODO: remove
+        self.socket.socketDirectory.close()
+        self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+
         self.socket.socketDirectory.send(msg)
         cmd = self.socket.socketDirectory.recv(4)
         if not cmd:
@@ -123,7 +114,12 @@ class Peer(object):
                         if idx == int(option):
                             found = True
                             print "Adding file " + file.name
-                            #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+                            # TODO: remove
+                            self.socket.socketDirectory.close()
+                            self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+
                             msg = 'ADDF' + self.sessionId + file.md5 + file.name.ljust(100)
                             print 'Share message: ' + msg
 
@@ -166,7 +162,13 @@ class Peer(object):
                         if idx == int_option:
                             found = True
                             print "Removing file " + file.name
-                            #c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+
+                            # TODO: remove
+                            self.socket.socketDirectory.close()
+                            self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+
                             msg = 'DELF' + self.sessionId + file.md5
                             print 'Delete message: ' + msg
 
@@ -199,8 +201,12 @@ class Peer(object):
             cmd = 'FIND' + self.sessionId + term.ljust(20)
 
             try:
-                #self.socket.socketDirectory.close()
-                #self.socket = Connection.Connection(self.dir_ipv4,self.dir_ipv6,int(self.dir_port))
+
+                # TODO: remove
+                self.socket.socketDirectory.close()
+                self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
+
+
                 self.socket.socketDirectory.send(cmd)
 
                 r = self.socket.socketDirectory.recv(4)
@@ -238,7 +244,7 @@ class Peer(object):
 
                         try:
                             for idx in range(0, int(idmd5)):
-                                file_i_md5 = self.socket.socketDirectory.recv(16)
+                                file_i_md5 = self.socket.socketDirectory.recv(32)
                                 file_i_name = self.socket.socketDirectory.recv(100).strip()
                                 file_i_copies = self.socket.socketDirectory.recv(3)
                                 file_owners = []
@@ -255,12 +261,12 @@ class Peer(object):
                         except Exception as e:
                             print 'Error: ' + e.message
 
-                        if availableFiles.count() == 0:
+                        if len(availableFiles) == 0:
                             print "No results found for search term: " + term
                             return
 
                         # visualizza i risultati della ricerca
-                        print "Select a file to download: "
+                        print "Select a file to download ('c' to cancel): "
                         for idx, file in enumerate(availableFiles):
                             print str(idx) + ": " + file.name
 
@@ -274,14 +280,17 @@ class Peer(object):
 
                             if option is None:
                                 print 'Please select an option'
+                            elif option == 'c':
+                                return
                             else:
                                 try:
                                     int_option = int(option)
                                 except ValueError:
                                     print "A number is required"
 
+
                         # visualizza la lista dei peer da cui è possibile scaricarlo
-                        print "Select a peer: "
+                        print "Select a peer ('c' to cancel): "
                         for idx, file in enumerate(availableFiles):
                             if int_option == idx:
                                 for idx2, owner in enumerate(file.owners):
@@ -296,6 +305,8 @@ class Peer(object):
 
                             if option is None:
                                 print 'Please select an option'
+                            elif option == 'c':
+                                return
                             else:
                                 try:
                                     int_option = int(option)
