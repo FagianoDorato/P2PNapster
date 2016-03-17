@@ -35,7 +35,7 @@ def recvall2(sock, buffer_size):
 
 
 def get_file(hostIpv4, hostIpv6, port, file):
-
+    print file.name
     PORT = port
     if True:
         HOST = hostIpv4
@@ -63,11 +63,11 @@ def get_file(hostIpv4, hostIpv6, port, file):
     cmd = 'RETR' + file.md5
     s.sendall(cmd)
 
-    r = s.recv(4)
-    if r != 'ARET':
+    r = s.recv(10)
+    if r[0:4] != 'ARET':
         s.close()
         return "Error ARET from Peer"
-    numChunks = int(s.recv(6))
+    numChunks = int(r[4:10])
 
     f = open('received/' + file.name, 'wb')
     #   f = open('shareable/' + file.name, 'wb')
