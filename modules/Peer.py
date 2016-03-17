@@ -28,8 +28,6 @@ class Peer(object):
 
 
     def __init__(self):
-        self.dir_ipv4 = "127.0.0.1"
-        self.dir_ipv6 = "fc00::1"
         # Searching for shareable files
         for root, dirs, files in os.walk("shareable"):
             for file in files:
@@ -46,7 +44,7 @@ class Peer(object):
         try:
             # Debug
             #response_message = 'ALGI1234567890123456'
-
+            self.socket = None
             self.socket = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
             self.socket.socketDirectory.send(msg)
             print 'Message sent, waiting for response...'

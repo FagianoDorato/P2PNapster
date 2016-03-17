@@ -35,7 +35,7 @@ def recvall2(sock, buffer_size):
 
 
 def get_file(hostIpv4, hostIpv6, port, file):
-    print file.name
+
     PORT = port
     if True:
         HOST = hostIpv4
@@ -63,11 +63,11 @@ def get_file(hostIpv4, hostIpv6, port, file):
     cmd = 'RETR' + file.md5
     s.sendall(cmd)
 
-    r = s.recv(10)
-    if r[0:4] != 'ARET':
+    r = s.recv(4)
+    if r != 'ARET':
         s.close()
         return "Error ARET from Peer"
-    numChunks = int(r[4:10])
+    numChunks = int(s.recv(6))
 
     f = open('received/' + file.name, 'wb')
     #   f = open('shareable/' + file.name, 'wb')
@@ -136,33 +136,30 @@ def get_file2(hostIpv4, hostIpv6, port, file):
 
                 #rsock, _, _= select.select([iodown_socket], [], [])
 
-                data = []
-                datalength = []
+                #data = []
+                #datalength = []
                 #if rsock:
                     #rsock = rsock[0]
-                rsock = iodown_socket
+                #rsock = iodown_socket
                 for i in range(0,int(num_chunk_clean)): #i e' il numero di chunk
                     print int(i)
-
-
                     #print "Watching chunk number " + str(int(i+1))
 
                     #devo leggere altri byte ora
                     #ne leggo 5 perche' 5 sono quelli che mi diranno poi quanto e' lungo il chunk
                     try:
-
-                        #lungh_form = iodown_socket.recv(5) #ricevo lunghezza chunck formattata
-                        #lungh_form = rsock.recv(5)
-                        #print lungh_form
-                        datalength.append(recvall2(rsock, 5))
-                        lungh = int(datalength[-1]) #converto in intero
-                        print lungh
+                        lungh_form = sockread(iodown_socket, 5) #ricevo lunghezza chunck formattata
+                        lungh = int(lungh_form)
+                        # lungh_form = rsock.recv(5)
+                        # print lungh_form
+                        #datalength.append(recvall2(rsock, 5))
+                        #lungh = int(datalength[-1]) #converto in intero
 
                         #devo leggere altri byte ora
                         #ne leggo lungh perche' quella e' proprio la lunghezza del chunk
 
-                        #data = iodown_socket.recv(lungh)
-                        data.append(recvall2(rsock, lungh))
+                        data = sockread(iodown_socket, lungh)
+                        #data.append(recvall2(rsock, lungh))
                         '''while len(data) < int(lungh_form):
                             data_overflow = iodown_socket.recv(int(lungh_form) - len(data))
                             data += data_overflow'''
@@ -173,7 +170,7 @@ def get_file2(hostIpv4, hostIpv6, port, file):
                         #recvd += data
                         #lo devo mettere sul mio file che ho nel mio pc
 
-                        #fout.write(data) #scrivo sul file in append
+                        fout.write(data) #scrivo sul file in append
 
                         #print ""
 
@@ -182,8 +179,8 @@ def get_file2(hostIpv4, hostIpv6, port, file):
                         print "Connection or File-access error -> %s" % expt
                         break
                 #ho finito di ricevere il file
-                result = b''.join(data)
-                fout.write(result)
+                #result = b''.join(data)
+                #fout.write(result)
                 fout.close()
                 print "finito di scrivere!" #chiudo il file perche' ho finito di scaricarlo
 
