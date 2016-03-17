@@ -18,11 +18,11 @@ def sockread(socket, numToRead): #in ingresso ricevo la socket e il numero di by
 
 
 def recvall(sock, buffer_size):
-
     buf = sock.recv(buffer_size)
     while buf:
         yield buf
         buf = sock.recv(buffer_size)
+
 
 def recvall2(sock, buffer_size):
     buf = b''
@@ -32,6 +32,7 @@ def recvall2(sock, buffer_size):
         buf += newbuf
         buffer_size -= len(newbuf)
     return buf
+
 
 def get_file(hostIpv4, hostIpv6, port, file):
 
@@ -87,6 +88,7 @@ def get_file(hostIpv4, hostIpv6, port, file):
     f.close()
     s.close()
     return "OK"
+
 
 def get_file2(hostIpv4, hostIpv6, port, file):
 
