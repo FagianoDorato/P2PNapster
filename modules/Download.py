@@ -2,19 +2,20 @@ import socket
 import time
 from random import randint
 import select
+import md5
+import hashlib
 
-def recvall(socket, numToRead): #in ingresso ricevo la socket e il numero di byte da leggere
 
-    lettiTot = socket.recv(numToRead)
-    num = len(lettiTot)
+def recvall(socket, chunk_size):
+    data = socket.recv(chunk_size)
+    actual_length = len(data)
 
-    while (num < numToRead):
-        letti = socket.recv(numToRead - num)
-        num = num + len(letti)
-        lettiTot = lettiTot + letti
+    while actual_length < chunk_size:
+        new_data = socket.recv(chunk_size - actual_length)
+        actual_length += len(new_data)
+        data += new_data
 
-    return lettiTot #restituisco la stringa letta
-    # end of recvall method
+    return data
 
 '''
 def recvall(sock, buffer_size):
@@ -90,34 +91,26 @@ def get_file(hostIpv4, hostIpv6, port, file):
     return "OK"
 '''
 
-def get_file(hostIpv4, hostIpv6, port, file):
+def get_file(host_ipv4, host_ipv6, host_port, file):
 
+    # TODO: Refactor variabili e metodi
     # TODO: scegliere a random ipv4 e ipv6
-    iodown_host = hostIpv4
-    iodown_port = int(port)
-    iodown_addr = (iodown_host, iodown_port)
-    iodown_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    download = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try: # e' necessario tenere sotto controllo la connessione, perche' puo' disconnettersi il peer o non essere disponibile
 
-        iodown_socket.connect(iodown_addr)
+        download.connect((host_ipv4,int(host_port)))
         #iodown_socket.setblocking(0)
-    except IOError: #IOError exception includes socket.error
-        print "Connection with " + hostIpv4 + "not available"
+    except socket.error as e:
+        print 'Socket Error: ' + e.message
     else:
-        print "Connection with peer enstablished.\n"
-        #print "Download will start shortly! Be patient"
+        print "Connection with peer enstablished\n"
 
-        # SPEDISCO IL PRIMO MESSAGGIO
-        iodown_socket.send("RETR" + file.md5)
-
+        download.send("RETR" + file.md5)
         try:
-            # Acknowledge "ARET" dal peer
-            #ack = iodown_socket.recv(10)
-            ack = iodown_socket.recv(10)
+            ack = download.recv(10)
         except IOError as e:
             print "Error: " + e.message
         else:
-
             if ack[:4] == 'ARET':
                 num_chunk = ack[4:10]
 
@@ -129,26 +122,38 @@ def get_file(hostIpv4, hostIpv6, port, file):
                 for i in range(0, int(num_chunk_clean)):
                     print 'Chunk n°' + int(i)
                     try:
-                        lungh_form = recvall(iodown_socket, 5)
-                        lungh = int(lungh_form)
-
-                        data = recvall(iodown_socket, lungh)
-                        #time.sleep(0.005)
-                        #recvd += data
+                        chunk_length = recvall(download, 5)
+                        data = recvall(download, int(chunk_length))
                         fout.write(data)
-                    except IOError, expt:
-                        print "Connection or File-access error -> %s" % expt
+                    except socket.error as e:
+                        print 'Socket Error: ' + e.message
+                        break
+                    except IOError as e:
+                        print 'File error: ' + e.message
+                        break
+                    except Exception as e:
+                        print 'Error: ' + e.message
                         break
                 fout.close()
-                print "Download Completato"
+                print 'Download completed'
+                print 'Checking file integrity...'
+                downloaded_md5 = md5.hashfile(open("shareable/" + fout, 'rb'), hashlib.md5())
+                if file.md5 == downloaded_md5:
+                    print 'The downloaded file is intact'
+                else:
+                    print 'Something is wrong. Check the downloaded file'
+            else:
+                print 'Error: unknown directory response.\n'
 
 
-def warns_directory(sessionId, file_md5, connToDir):
-    cmd = 'GREG' + sessionId + file_md5
-    connToDir.socketDirectory.sendall(cmd)
-    res_msg = connToDir.soketDirectory.recv(14)
-    numDown = int(res_msg[4:14])
-    if res_msg[0:3] == 'ADRE' and isinstance(numDown, int):
-        print 'Gli altri peer hanno scaricato ' + numDown + ' copie dello stesso file'
+def warns_directory(session_id, file_md5, directory):
+    # TODO: INSERIRE CONTROLLI!!!!!!!!!!!!!!!!!!!
+
+    cmd = 'GREG' + session_id + file_md5
+    directory.sendall(cmd)
+    res_msg = directory.recv(14)
+    num_down = int(res_msg[4:14])
+    if res_msg[0:3] == 'ADRE' and isinstance(num_down, int):
+        print 'Other peers downloaded ' + num_down + ' copies of the same file'
     else:
-        print 'Errore nella risposta dalla directory'
+        print 'Error'

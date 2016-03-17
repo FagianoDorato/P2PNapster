@@ -1,7 +1,7 @@
 
-def hashfile(afile, hasher, blocksize=65536):
-    buf = afile.read(blocksize)
+def hashfile(file, hasher, blocksize=65536):
+    buf = file.read(blocksize)
     while len(buf) > 0:
         hasher.update(buf)
-        buf = afile.read(blocksize)
+        buf = file.read(blocksize)
     return hasher.hexdigest()

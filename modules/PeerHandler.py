@@ -31,7 +31,6 @@ class PeerHandler(threading.Thread):
         cmd = self.conn.recv(4)
         print cmd
         if cmd == "RETR":
-
             self.md5 = self.conn.recv(16)
 
             found_name = None
@@ -53,7 +52,7 @@ class PeerHandler(threading.Thread):
                     num_of_chunks+=1
 
                 num_chunks_form = '%(#)06d' % {"#" : int(num_of_chunks)}
-                file.seek(0,0) #sposto la testina di lettura ad inizio file
+                file.seek(0, 0)
                 try :
                     buff = file.read(chunk_dim)
                     chunk_sent = 0
@@ -61,23 +60,20 @@ class PeerHandler(threading.Thread):
                     while len(buff) == chunk_dim :
                         chunk_dim_form = '%(#)05d' % {"#" : len(buff)}
                         try:
-
-                            #print chunk_dim_form
                             self.conn.sendall(str(chunk_dim_form) + buff)
                             chunk_sent = chunk_sent +1
-                            #print "Sent " + str(chunk_sent) + " chunks to " + str(self.addrclient[0])#TODO debug
                             buff = file.read(chunk_dim)
                         except IOError:
                             print "Connection error due to the death of the peer!!!\n"
                     if len(buff) != 0:
                         chunk_last_form = '%(#)05d' % {"#" : len(buff)}
                         self.conn.sendall(chunk_last_form + buff)
-                    print "End of upload "
+                    print "Upload Completed"
                     file.close()
                 except EOFError:
                     print "You have read a EOF char"
         else:
-            print "ack parsing failed, for RETR\n"
+            print "Error: unknown directory response.\n"
 
         self.conn.shutdown(1)
         self.conn.close()

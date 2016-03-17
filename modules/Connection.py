@@ -8,7 +8,7 @@ from thread import *
 
 class Connection:
     #   SessionID = None
-    socketDirectory = None
+    socket_directory = None
     socketPeer = None
     dir_ipv4 = None
     dir_port = None
@@ -29,9 +29,9 @@ class Connection:
         #print (self.dir_ipv6)
         if True:
             self.ip_selector = 1
-            self.socketDirectory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket_directory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                self.socketDirectory.connect((self.dir_ipv4, self.dir_port))
+                self.socket_directory.connect((self.dir_ipv4, self.dir_port))
                 #print ("\t--->Succesfully connected ipv4!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
@@ -39,9 +39,9 @@ class Connection:
 
         else:  # case: ipv6
             self.ip_selector = 0
-            self.socketDirectory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+            self.socket_directory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
-                self.socketDirectory.connect((self.dir_ipv6, self.dir_port))
+                self.socket_directory.connect((self.dir_ipv6, self.dir_port))
                 #print ("\t--->Succesfully connected ipv6!\n")
             except socket.error, msg:
                 print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.\nSocket.error : %s" % msg)

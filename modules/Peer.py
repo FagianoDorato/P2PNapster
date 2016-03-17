@@ -8,8 +8,9 @@ import socket
 import Connection
 import md5
 
+
 class Peer(object):
-    sessionId = None
+    session_id = None
     my_ipv4 = "172.030.008.002"
     my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     my_port = "06000"
@@ -18,8 +19,7 @@ class Peer(object):
     dir_ipp2p = dir_ipv4 + dir_ipv6
     dir_port = "03000"
     response_message = None
-    filesList = []
-    number_share_files = 0
+    files_list = []
     directory = None
 
     def __init__(self):
@@ -28,7 +28,7 @@ class Peer(object):
             for file in files:
                 file_md5 = md5.hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
                 new_file = SharedFile(file, file_md5)
-                self.filesList.append(new_file)
+                self.files_list.append(new_file)
 
     def login(self):
         print 'Logging in...'
@@ -38,7 +38,7 @@ class Peer(object):
         response_message = None
         try:
             self.directory = None
-            self.directory = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port)).socketDirectory
+            self.directory = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port)).socket_directory
             self.directory.send(msg)
             print 'Message sent, waiting for response...'
             response_message = self.directory.recv(20)
@@ -46,18 +46,18 @@ class Peer(object):
             print 'Error: ' + e.message
 
         if response_message is None:
-            print "Login failed."
+            print "Login failed"
         else:
-            self.sessionId = response_message[4:20]
-            if self.sessionId == '0000000000000000' or self.sessionId == '':
-                print "problems with the login.\nPlease, try again."
+            self.session_id = response_message[4:20]
+            if self.session_id == '0000000000000000' or self.session_id == '':
+                print "Troubles with the login procedure.\nPlease, try again."
             else:
-                print "sessionID assigned by the directory: " + self.sessionId
-        #c.close()
+                print "Session ID assigned by the directory: " + self.session_id
+                print "Login completed"
 
     def logout(self):
         print 'Logging out...'
-        msg = 'LOGO' + self.sessionId
+        msg = 'LOGO' + self.session_id
         print "Logout message: " + msg
 
         response_message = None
@@ -74,7 +74,7 @@ class Peer(object):
         if response_message is None:
             print "Login failed."
         elif response_message[0:3] == 'ALGO':
-            self.sessionId = None
+            self.session_id = None
             number_file = int(response_message[4:7])
             print "You'd shared " + number_file + "files"
             self.directory.close()
@@ -84,7 +84,7 @@ class Peer(object):
         found = False
         while not found:
             print "\nSelect a file to share ('c' to cancel):"
-            for idx, file in enumerate(self.filesList):
+            for idx, file in enumerate(self.files_list):
                 print str(idx) + ": " + file.name
 
             try:
@@ -102,7 +102,7 @@ class Peer(object):
                 except ValueError:
                     print "A number is required"
                 else:
-                    for idx, file in enumerate(self.filesList):
+                    for idx, file in enumerate(self.files_list):
                         if idx == int_option:
                             found = True
                             print "Adding file " + file.name
@@ -112,7 +112,7 @@ class Peer(object):
                             self.directory = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
 
 
-                            msg = 'ADDF' + self.sessionId + file.md5 + file.name.ljust(100)
+                            msg = 'ADDF' + self.session_id + file.md5 + file.name.ljust(100)
                             print 'Share message: ' + msg
 
                             try:
@@ -130,10 +130,9 @@ class Peer(object):
 
     def remove(self):
         found = False
-        exit = False
-        while not found and not exit:
+        while not found:
             print "\nSelect a file to remove ('c' to cancel):"
-            for idx, file in enumerate(self.filesList):
+            for idx, file in enumerate(self.files_list):
                 print str(idx) + ": " + file.name
             try:
                 option = raw_input()
@@ -150,18 +149,16 @@ class Peer(object):
                 except ValueError:
                     print "A number is required"
                 else:
-                    for idx, file in enumerate(self.filesList):
+                    for idx, file in enumerate(self.files_list):
                         if idx == int_option:
                             found = True
                             print "Removing file " + file.name
-
 
                             # TODO: remove
                             self.directory.close()
                             self.directory = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port))
 
-
-                            msg = 'DELF' + self.sessionId + file.md5
+                            msg = 'DELF' + self.session_id + file.md5
                             print 'Delete message: ' + msg
 
                             try:
@@ -190,7 +187,7 @@ class Peer(object):
         else:
             print "Searching files that match: " + term
 
-            cmd = 'FIND' + self.sessionId + term.ljust(20)
+            cmd = 'FIND' + self.session_id + term.ljust(20)
 
             try:
 
@@ -306,13 +303,10 @@ class Peer(object):
                             if int_option == idx2:
                                 print "Downloading file from: " + owner.ipv4 + " | " + owner.ipv6 + " " + owner.port
                                 Download.get_file(owner.ipv4, owner.ipv6, owner.port, file)
-                                Download.warns_directory(self.sessionId, file.md5, self.directory.socketDirectory)
+                                Download.warns_directory(self.session_id, file.md5, self.directory.socket_directory)
                     else:
                         print "Unknown error, check your code!"
 
-
-            #c.close()
-        # self.download(availableFiles)
 
 
     '''#  availableFiles è una lista recuperata tramite la ricerca che contiene i risultati

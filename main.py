@@ -7,7 +7,7 @@ from modules import PeerServer
 # main
 p = Peer.Peer()
 
-while p.sessionId is None:
+while p.session_id is None:
     print 'Select one of the following options:'
     print '1: Log In'
     int_option = None
@@ -31,10 +31,10 @@ while p.sessionId is None:
         p.login()
 
         # TODO: Start peer server
-        peerserver = PeerServer.PeerServer(p.my_ipv4, p.my_ipv6, p.my_port, p.filesList)
+        peerserver = PeerServer.PeerServer(p.my_ipv4, p.my_ipv6, p.my_port, p.files_list)
         peerserver.start()
 
-        while p.sessionId is not None:
+        while p.session_id is not None:
             print "\nSelect one of the following options:"
             print "1: Add File"
             print "2: Remove File"
