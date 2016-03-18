@@ -22,11 +22,11 @@ class PeerServer(threading.Thread):
         self.fileList = fileList
 
     def run(self):
-        self.peerserver_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.peerserver_socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         self.peerserver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.peerserver_socket.bind((self.peerserver_ipv4, int(self.peerserver_port)))
+        self.peerserver_socket.bind((self.peerserver_ipv6, int(self.peerserver_port)))
         self.peerserver_socket.listen(5)
-        #print "listening for peers on " + self.peerserver_ipv4 + " " + self.peerserver_port
+
         try:
             while self.allow_run:
                 try:
@@ -35,13 +35,11 @@ class PeerServer(threading.Thread):
 
                     peer = PeerHandler.PeerHandler(conn, addr, self.fileList)
                     peer.start()
-                except Exception,err:
-                    print "Error: "+Exception+" / " + err
+                except Exception as e:
+                    print "Error: "+Exception+" / " + e.message
 
         finally:
             conn.close()
-
-
 
     def stop(self):
         self.allow_run = False

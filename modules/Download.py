@@ -1,9 +1,9 @@
 import socket
 import time
 from random import randint
-import select
 import md5
 import hashlib
+import Connection
 
 
 def recvall(socket, chunk_size):
@@ -91,69 +91,79 @@ def get_file(hostIpv4, hostIpv6, port, file):
     return "OK"
 '''
 
-def get_file(host_ipv4, host_ipv6, host_port, file):
+def get_file(session_id, host_ipv4, host_ipv6, host_port, file, directory):
 
     # TODO: Refactor variabili e metodi
     # TODO: scegliere a random ipv4 e ipv6
-    download = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try: # e' necessario tenere sotto controllo la connessione, perche' puo' disconnettersi il peer o non essere disponibile
+    download = Connection.Connection(host_ipv4, host_ipv6, int(host_port)).socket_directory
+    #try: # e' necessario tenere sotto controllo la connessione, perche' puo' disconnettersi il peer o non essere disponibile
 
-        download.connect((host_ipv4,int(host_port)))
+    #   download.connect((host_ipv4,int(host_port)))
         #iodown_socket.setblocking(0)
+    #except socket.error as e:
+    #    print 'Socket Error: ' + e.message
+    #else:
+    #print 'Connection with peer enstablished\n'
+    msg = 'RETR' + file.md5
+    try:
+        download.send(msg)
+        print 'Download Message: ' + msg
+        ack = download.recv(10)
     except socket.error as e:
-        print 'Socket Error: ' + e.message
+        print 'Error: ' + e.strerror
+    except IOError as e:
+        print "Error: " + e.strerror
     else:
-        print "Connection with peer enstablished\n"
+        if ack[:4] == 'ARET':
+            num_chunk = ack[4:10]
 
-        download.send("RETR" + file.md5)
-        try:
-            ack = download.recv(10)
-        except IOError as e:
-            print "Error: " + e.message
-        else:
-            if ack[:4] == 'ARET':
-                num_chunk = ack[4:10]
+            filename = file.name
+            fout = open('received/' + filename, "ab")
 
-                filename = file.name
-                fout = open('received/' + filename, "ab")
+            num_chunk_clean = str(num_chunk).lstrip('0')
 
-                num_chunk_clean = str(num_chunk).lstrip('0')
+            for i in range(0, int(num_chunk_clean)):
+                print 'Chunk n' + int(i)
+                try:
+                    chunk_length = recvall(download, 5)
+                    data = recvall(download, int(chunk_length))
+                    fout.write(data)
+                except socket.error as e:
+                    print 'Socket Error: ' + e.message
+                    break
+                except IOError as e:
+                    print 'File error: ' + e.message
+                    break
+                except Exception as e:
+                    print 'Error: ' + e.message
+                    break
+            fout.close()
+            print 'Download completed'
 
-                for i in range(0, int(num_chunk_clean)):
-                    print 'Chunk n°' + int(i)
-                    try:
-                        chunk_length = recvall(download, 5)
-                        data = recvall(download, int(chunk_length))
-                        fout.write(data)
-                    except socket.error as e:
-                        print 'Socket Error: ' + e.message
-                        break
-                    except IOError as e:
-                        print 'File error: ' + e.message
-                        break
-                    except Exception as e:
-                        print 'Error: ' + e.message
-                        break
-                fout.close()
-                print 'Download completed'
-                print 'Checking file integrity...'
-                downloaded_md5 = md5.hashfile(open("shareable/" + fout, 'rb'), hashlib.md5())
-                if file.md5 == downloaded_md5:
-                    print 'The downloaded file is intact'
-                else:
-                    print 'Something is wrong. Check the downloaded file'
+            warns_directory(session_id, file.md5, directory)
+            print 'Checking file integrity...'
+            downloaded_md5 = md5.hashfile(open("shareable/" + fout, 'rb'), hashlib.md5())
+            if file.md5 == downloaded_md5:
+                print 'The downloaded file is intact'
             else:
-                print 'Error: unknown directory response.\n'
-
+                print 'Something is wrong. Check the downloaded file'
+        else:
+            print 'Error: unknown response from directory.\n'
 
 def warns_directory(session_id, file_md5, directory):
-    # TODO: INSERIRE CONTROLLI!!!!!!!!!!!!!!!!!!!
+    cmd = 'DREG' + session_id + file_md5
+    try:
+        directory.sendall(cmd)
+        print 'Message sent, waiting for response...'
+        response_message = directory.recv(14)
+        print 'Directory responded: ' + response_message
+    except socket.error as e:
+        print 'Socket Error: ' + e.message
+    except Exception as e:
+        print 'Error: ' + e.message
 
-    cmd = 'GREG' + session_id + file_md5
-    directory.sendall(cmd)
-    res_msg = directory.recv(14)
-    num_down = int(res_msg[4:14])
-    if res_msg[0:3] == 'ADRE' and isinstance(num_down, int):
+    num_down = int(response_message[4:14])
+    if response_message[0:3] == 'ADRE' and isinstance(num_down, int):
         print 'Other peers downloaded ' + num_down + ' copies of the same file'
     else:
-        print 'Error'
+        print 'Error: unknown response from directory.\n'

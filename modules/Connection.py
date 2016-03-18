@@ -9,13 +9,11 @@ from thread import *
 class Connection:
     #   SessionID = None
     socket_directory = None
-    socketPeer = None
     dir_ipv4 = None
     dir_port = None
     dir_ipv6 = None
     ip_selector = random.randrange(0, 100) % 2
     string_read = None
-    size = 1024
     message_received = None
 
     #   ip: string ipv6 + ipv4
@@ -32,18 +30,18 @@ class Connection:
             self.socket_directory = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 self.socket_directory.connect((self.dir_ipv4, self.dir_port))
-                #print ("\t--->Succesfully connected ipv4!\n")
+                print ("Succesfully connected to :" + self.dir_ipv4 + str(self.dir_port))
             except socket.error, msg:
-                print ("--!!!--> Connection error ipv4! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
+                print ("Connection error ipv4!\nTerminated.\nSocket.error : %s" % msg)
                 print self.dir_ipv4 + str(self.dir_port)
 
-        else:  # case: ipv6
+        else:
             self.ip_selector = 0
             self.socket_directory = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             try:
                 self.socket_directory.connect((self.dir_ipv6, self.dir_port))
-                #print ("\t--->Succesfully connected ipv6!\n")
+                print ("Succesfully connected to :" + self.dir_ipv6 + str(self.dir_port))
             except socket.error, msg:
-                print ("--!!!--> Connection error ipv6! <--!!!--\nTerminated.\nSocket.error : %s" % msg)
+                print ("Connection error ipv6!\nTerminated.\nSocket.error : %s" % msg)
                 print self.dir_ipv4 + str(self.dir_port)
 
