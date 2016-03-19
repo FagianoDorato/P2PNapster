@@ -104,8 +104,8 @@ class Client(threading.Thread):
                             numChunks = length / 1024 + 1
 
                             strChunks = str(numChunks).zfill(6)
-                            conn.send('ARET')
-                            conn.send(strChunks)
+                            conn.send('ARET'+strChunks)
+
                             msg = ''
                             with open("share/" + file, 'rb') as f:
                                 l = f.read(1024)
