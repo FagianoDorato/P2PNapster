@@ -50,7 +50,7 @@ class Client(threading.Thread):
                         response += filemd5
                         response += filename
                         response += copies  # 2 copie
-                        response += '127.000.000.001|fc00:0000:0000:0000:0000:0000:0000:0001'
+                        response += '127.000.000.001|0000:0000:0000:0000:0000:0000:0000:0001'
                         response += '03000'
                         response += '172.030.008.003|fc00:0000:0000:0000:0000:0000:0008:0003'
                         response += '03000'
