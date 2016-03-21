@@ -1,5 +1,7 @@
+# coding=utf-8
 import threading
 import socket
+
 
 class PeerHandler(threading.Thread):
     conn = None
