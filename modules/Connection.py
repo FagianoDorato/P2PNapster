@@ -29,6 +29,7 @@ class Connection:
     def connect(self):
         if random.choice([0, 1]) == 0:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
                 self.socket.connect((self.ipv4, self.port))
                 print ("Succesfully connected to :" + self.ipv4 + str(self.port))
@@ -38,6 +39,7 @@ class Connection:
 
         else:
             self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
                 self.socket.connect((self.ipv6, self.port))
                 print ("Succesfully connected to :" + self.ipv6 + str(self.port))
