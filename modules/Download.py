@@ -46,7 +46,7 @@ def get_file(session_id, host_ipv4, host_ipv6, host_port, file, directory):
             n_chunks = str(n_chunks).lstrip('0')
 
             for i in range(0, int(n_chunks)):
-                print 'Chunk n' + int(i)
+                print 'Chunk n' + str(i)
                 try:
                     chunk_length = recvall(download, 5)
                     data = recvall(download, int(chunk_length))
@@ -65,7 +65,7 @@ def get_file(session_id, host_ipv4, host_ipv6, host_port, file, directory):
 
             warns_directory(session_id, file.md5, directory)
             print 'Checking file integrity...'
-            downloaded_md5 = md5.hashfile(open("received/" + fout, 'rb'), hashlib.md5())
+            downloaded_md5 = md5.hashfile(open("received/" + fout.name, 'rb'), hashlib.md5())
             if file.md5 == downloaded_md5:
                 print 'The downloaded file is intact'
             else:

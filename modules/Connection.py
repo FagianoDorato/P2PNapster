@@ -20,7 +20,7 @@ class Connection:
     def __init__(self, ipv4, ipv6, port):
         self.ipv4 = ipv4
         self.ipv6 = ipv6
-        self.port = port
+        self.port = int(port)
         #self.ipv4 = '127.0.0.1'
         #self.ipv6 = '::1'
         #print (self.dir_ipv4)

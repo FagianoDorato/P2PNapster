@@ -76,7 +76,7 @@ class PeerHandler(threading.Thread):
                                         msg = str(len(buff)).zfill(5) + buff
                                         self.conn.sendall(msg)
                                         chunk_sent += 1
-                                        print 'Sent ' + chunk_sent
+                                        print 'Sent ' + str(chunk_sent)
                                         buff = file.read(chunk_dim)
                                     except IOError:
                                         print "Connection error due to the death of the peer!!!\n"

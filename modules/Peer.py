@@ -87,7 +87,7 @@ class Peer(object):
             elif response_message[0:4] == 'ALGO':
                 self.session_id = None
                 number_file = int(response_message[4:7])
-                print 'You\'d shared ' + number_file + ' files'
+                print 'You\'d shared ' + str(number_file) + ' files'
                 self.directory.close()
                 print 'Logout completed'
             else:
