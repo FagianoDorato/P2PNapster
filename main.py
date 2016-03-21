@@ -65,6 +65,6 @@ while p.session_id is None:
             elif int_option == 4:
                 p.logout()
                 # TODO: stop peer server
-                #peerserver.stop()
+                peerserver.stop()
             else:
                 print 'Option ' + str(int_option) + ' not available'

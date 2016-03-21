@@ -38,7 +38,11 @@ class Peer(object):
         response_message = None
         try:
             self.directory = None
-            self.directory = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port)).socket_directory
+            c = Connection.Connection(self.dir_ipv4, self.dir_ipv6, self.dir_port)
+            c.connect()
+            self.directory = c.socket
+            #self.directory = Connection.Connection(self.dir_ipv4, self.dir_ipv6, int(self.dir_port)).socket
+
             self.directory.send(msg)
             print 'Message sent, waiting for response...'
             response_message = self.directory.recv(20)
