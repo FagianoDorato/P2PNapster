@@ -2,8 +2,8 @@
 from modules import Peer
 import sys
 from modules import PeerServer
-# main
 
+# main
 # Inizializzazione del peer
 p = Peer.Peer()
 

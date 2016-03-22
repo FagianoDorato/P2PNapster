@@ -1,9 +1,9 @@
 # coding=utf-8
 import socket
-import md5
+import helpers
 import hashlib
 import Connection
-
+import helpers
 
 def recvall(socket, chunk_size):
     """
@@ -64,14 +64,19 @@ def get_file(session_id, host_ipv4, host_ipv6, host_port, file, directory):
     else:
         if response_message[:4] == 'ARET':
             n_chunks = response_message[4:10]                                       # Numero di parti del file da scaricare
+            #tmp = 0
 
             filename = file.name
             fout = open('received/' + filename, "wb")                               # Apertura di un nuovo file in write byte mode (sovrascrive se già esistente)
 
             n_chunks = int(str(n_chunks).lstrip('0'))                               # Rimozione gli 0 dal numero di parti e converte in intero
 
-            for i in range(0, n_chunks):                                            # Download delle parti del file
-                print 'Chunk n: ' + str(i)
+            for i in range(0, n_chunks):
+                if i == 0:
+                    print 'Download started...'
+
+                helpers.update_progress(i, n_chunks, 'Downloading ' + fout.name)    # Stampa a video del progresso del download
+
                 try:
                     chunk_length = recvall(download, 5)                             # Ricezione dal peer la lunghezza della parte di file
                     data = recvall(download, int(chunk_length))                     # Ricezione dal peer la parte del file
@@ -90,7 +95,7 @@ def get_file(session_id, host_ipv4, host_ipv6, host_port, file, directory):
 
             warns_directory(session_id, file.md5, directory)                        # Invocazione del metododo che segnala il download alla directory
             print 'Checking file integrity...'
-            downloaded_md5 = md5.hashfile(open(fout.name, 'rb'), hashlib.md5())     # Controllo dell'integrità del file appena scarcato tramite md5
+            downloaded_md5 = helpers.hashfile(open(fout.name, 'rb'), hashlib.md5())     # Controllo dell'integrità del file appena scarcato tramite md5
             if file.md5 == downloaded_md5:
                 print 'The downloaded file is intact'
             else:
@@ -127,3 +132,6 @@ def warns_directory(session_id, file_md5, directory):
         print 'Other peers downloaded ' + str(num_down) + ' copies of the same file'
     else:
         print 'Error: unknown response from directory.\n'
+
+
+

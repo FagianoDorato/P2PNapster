@@ -4,7 +4,7 @@ import SharedFile
 import os
 import hashlib
 from random import randint
-import md5
+import helpers
 
 import threading
 
@@ -44,7 +44,7 @@ class Client(threading.Thread):
 
                 for root, dirs, files in os.walk("./share"):
                     for file in files:
-                        filemd5 = md5.hashfile(open("./share/" + file, 'rb'), hashlib.md5())
+                        filemd5 = helpers.hashfile(open("./share/" + file, 'rb'), hashlib.md5())
                         filename = file.ljust(100)
                         copies = str(2).zfill(3)
                         response += filemd5
@@ -96,7 +96,7 @@ class Client(threading.Thread):
 
                 for root, dirs, files in os.walk("share"):
                     for file in files:
-                        fileMd5 = md5.hashfile(open("share/" + file, 'rb'), hashlib.md5())
+                        fileMd5 = helpers.hashfile(open("share/" + file, 'rb'), hashlib.md5())
                         if fileRemoteMd5 == fileMd5:
                             print "Nome file dal client: ", file
                             length = os.stat("share/" + file).st_size

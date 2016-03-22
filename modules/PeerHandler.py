@@ -1,7 +1,7 @@
 # coding=utf-8
 import threading
 import socket
-
+import helpers
 
 class PeerHandler(threading.Thread):
     """
@@ -92,18 +92,18 @@ class PeerHandler(threading.Thread):
                             print 'Error: ' + e.message + "\n"
                         else:
                             tot_dim = self.filesize("shareable/" + found_name)      # Calcolo delle dimesioni del file
-                            num_of_chunks = int(tot_dim // chunk_size)              # Calcolo del numero di parti
+                            n_chunks = int(tot_dim // chunk_size)              # Calcolo del numero di parti
                             resto = tot_dim % chunk_size                            # Eventuale resto
                             if resto != 0.0:
-                                num_of_chunks += 1
+                                n_chunks += 1
 
                             file.seek(0, 0)                                         # Spostamento all'inizio del file
 
                             try:
                                 buff = file.read(chunk_size)                        # Lettura del primo chunk
-                                chunk_sent = 0
+                                chunks_sent = 0
 
-                                msg = 'ARET' + str(num_of_chunks).zfill(6)          # Risposta alla richiesta di download, deve contenere ARET ed il numero di chunks che saranno inviati
+                                msg = 'ARET' + str(n_chunks).zfill(6)               # Risposta alla richiesta di download, deve contenere ARET ed il numero di chunks che saranno inviati
                                 print 'Upload Message: ' + msg
                                 self.conn.sendall(msg)
                                 print 'Sending chunks...'
@@ -111,10 +111,12 @@ class PeerHandler(threading.Thread):
                                 while len(buff) == chunk_size:                      # Invio dei chunks
                                     try:
                                         msg = str(len(buff)).zfill(5) + buff
-                                        self.conn.sendall(msg)
-                                        chunk_sent += 1
-                                        print 'Sent ' + str(chunk_sent)
-                                        buff = file.read(chunk_size)
+                                        self.conn.sendall(msg)                      # Invio di
+                                        chunks_sent += 1
+
+                                        helpers.update_progress(chunks_sent, n_chunks, 'Uploading ' + file.name)    # Stampa a video del progresso dell'upload
+
+                                        buff = file.read(chunk_size)                # Lettura chunk successivo
                                     except IOError:
                                         print "Connection error due to the death of the peer!!!\n"
                                 if len(buff) != 0:                                  # Invio dell'eventuale resto, se più piccolo di chunk_size
@@ -128,4 +130,4 @@ class PeerHandler(threading.Thread):
                 print "Error: unknown directory response.\n"
 
         self.conn.shutdown(1)                                                       # Segnalazione di fine comunicazione
-        self.conn.close()                                                           # Chiusura com
+        self.conn.close()                                                           # Chiusura comunicazione

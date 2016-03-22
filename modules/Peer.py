@@ -6,7 +6,7 @@ import Download
 import hashlib
 import socket
 import Connection
-import md5
+import helpers
 
 
 class Peer(object):
@@ -28,8 +28,8 @@ class Peer(object):
     my_ipv4 = "172.030.008.002"
     my_ipv6 = "fc00:0000:0000:0000:0000:0000:0008:0002"
     my_port = "06000"
-    dir_ipv4 = "172.030.001.003"
-    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0001:0003"
+    dir_ipv4 = "172.030.001.001"
+    dir_ipv6 = "fc00:0000:0000:0000:0000:0000:0001:0001"
     dir_port = "03000"
     files_list = []
     directory = None
@@ -41,7 +41,7 @@ class Peer(object):
         # Searching for shareable files
         for root, dirs, files in os.walk("shareable"):
             for file in files:
-                file_md5 = md5.hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
+                file_md5 = helpers.hashfile(open("shareable/" + file, 'rb'), hashlib.md5())
                 new_file = SharedFile(file, file_md5)
                 self.files_list.append(new_file)
 
