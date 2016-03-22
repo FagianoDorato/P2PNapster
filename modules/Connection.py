@@ -8,14 +8,11 @@ class Connection:
     """
     Crea le connessioni a directory e peers
 
-    :param socket: socket per le comunicazioni
-    :type socket: object
-    :param ipv4: indirizzo ipv4
-    :type ipv4: str
-    :param ipv6: indirizzo ipv6
-    :type ipv6: str
-    :param port: porta
-    :type port: str
+    Attributes:
+        socket: socket per le comunicazioni
+        ipv4: indirizzo ipv4
+        ipv6: indirizzo ipv6
+        port: porta
     """
     socket = None
     ipv4 = None
@@ -113,6 +110,10 @@ class Connection:
             print self.ipv4 + " " + str(self.port)
 
     def listen_v6(self):
+        """
+        Crea una socket TCP selezionando un indirizzo a caso (con probabilità 50/50) tra ipv4 e ipv6
+        Da utilizzare per le richieste degli altri peer
+        """
         self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)                # creazione socket ipv6
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:

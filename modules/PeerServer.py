@@ -60,10 +60,8 @@ class PeerServer(threading.Thread):
         """
         Gestisce le connessioni in entrata creando per ognuna un nuovo thread che effettua l'upload del file richiesto
         """
-
-        # TODO: in questo modo sceglie un ip ad ogni avvio del server invece che sceglierlo ad ogni connessione
-        c = Connection.Connection(self.ps_ipv4, self.ps_ipv6, self.ps_port) # Inizializzazione della socket in ascolto per le richieste degli altri peer
-        c.listen()
+        c = Connection.Connection(self.ps_ipv4, self.ps_ipv6, self.ps_port)         # Inizializzazione della socket in ascolto per le richieste degli altri peer
+        c.listen_v4()
         self.ps_socket_v4 = c.socket
 
         try:
@@ -76,16 +74,10 @@ class PeerServer(threading.Thread):
                     peer.start()
                     self.threads.append(peer)                                       # Inserimento del thread nella lista dei thread attivi
 
-                    # TODO: si dovrebbe creare qui una nuova socket in ascolto su una porta diversa per avere i client distribuiti 50/50 su ipv4 e ipv6
-                    #c = Connection.Connection(self.ps_ipv4, self.ps_ipv6, self.ps_port)
-                    #c.listen()
-                    #self.ps_socket_v4 = c.socket
                 except Exception as e:
                     print "Error: "+Exception+" / " + e.message
         except Exception as e:
             print 'Error: ' + e.message
-        #finally:
-        #    conn.close()
     '''
 
     def run(self):
@@ -93,7 +85,6 @@ class PeerServer(threading.Thread):
         Gestisce le connessioni in entrata creando per ognuna un nuovo thread che effettua l'upload del file richiesto
         """
 
-        # TODO: in questo modo sceglie un ip ad ogni avvio del server invece che sceglierlo ad ogni connessione
         c = Connection.Connection(self.ps_ipv4, self.ps_ipv6, self.ps_port) # Inizializzazione della socket in ascolto per le richieste degli altri peer
         c.listen_v4()
         self.ps_socket_v4 = c.socket
@@ -128,8 +119,6 @@ class PeerServer(threading.Thread):
                             print "Error: "+Exception+" / " + e.message
         except Exception as e:
             print 'Error: ' + e.message
-        #finally:
-        #    conn.close()
 
     def stop(self):
         """

@@ -4,30 +4,62 @@ import socket
 
 
 class PeerHandler(threading.Thread):
+    """
+    gestore dei peer che si connettono per scaricare un file
+    :param conn: connessione al peer che vuole effettuare il download
+    :type conn: object
+    :param addr: indirizzi del peer che vuole effettuare il download
+    :type addr: object
+    :param file_list: lista dei file disponibili per l'upload
+    :type file_list: list
+    """
     conn = None
     addr = None
-    fileList = None
+    file_list = None
     md5 = None
 
-    def __init__(self, conn, addr, fileList):
+    def __init__(self, conn, addr, file_list):
+        """
+        Costruttore della classe PeerHandler
+
+        :param conn: connessione al peer che vuole effettuare il download
+        :type conn: object
+        :param addr: indirizzi del peer che vuole effettuare il download
+        :type addr: object
+        :param file_list: lista dei file disponibili per l'upload
+        :type file_list: list
+        """
         threading.Thread.__init__(self)
 
         self.conn = conn
         self.addr = addr
-        self.fileList = fileList
+        self.file_list = file_list
 
     def filesize(self, n):
-        F = open(n,'r')
-        F.seek(0,2)
-        sz = F.tell()
-        F.seek(0,0)
-        F.close()
+        """
+        Calcola la dimensione del file
+
+        :param n: nome del file
+        :type n: str
+        :return: dimensione del file
+        :rtype: int
+        """
+
+        f = open(n, 'r')
+        f.seek(0, 2)
+        sz = f.tell()
+        f.seek(0, 0)
+        f.close()
         return sz
 
     def run(self):
+        """
+        Codice eseguito nel thread.
+        Riceve dal peer l'md5 del file che desidera scaricare e lo invia diviso in parti
+        """
 
         try:
-            cmd = self.conn.recv(4)
+            cmd = self.conn.recv(4)                                                 # Ricezione del comando di download dal peer, deve contenere RETR
         except socket.error as e:
             print 'Socket Error: ' + e.message
         except Exception as e:
@@ -35,7 +67,7 @@ class PeerHandler(threading.Thread):
         else:
             if cmd == "RETR":
                 try:
-                    self.md5 = self.conn.recv(32)
+                    self.md5 = self.conn.recv(32)                                   # Ricezione dell'md5 del file da inviare
                     print 'Received md5: ' + self.md5
                 except socket.error as e:
                     print 'Socket Error: ' + e.message
@@ -44,53 +76,56 @@ class PeerHandler(threading.Thread):
                 else:
                     found_name = None
 
-                    for idx, file in enumerate(self.fileList):
+                    for idx, file in enumerate(self.file_list):                     # Ricerca del file da inviare tra quelli disponibili
                         if file.md5 == self.md5:
                             found_name = file.name
 
                     if found_name is None:
                         print 'Found no file with md5: ' + self.md5
                     else:
-                        chunk_dim = 2048
+
+                        chunk_size = 1024                                           # Dimensione di una parte di file
+
                         try:
                             file = open("shareable/" + found_name, "rb")
                         except Exception as e:
                             print 'Error: ' + e.message + "\n"
                         else:
-                            tot_dim = self.filesize("shareable/" + found_name)
-                            num_of_chunks = int(tot_dim // chunk_dim) #risultato intero della divisione
-                            resto = tot_dim % chunk_dim #eventuale resto della divisione
+                            tot_dim = self.filesize("shareable/" + found_name)      # Calcolo delle dimesioni del file
+                            num_of_chunks = int(tot_dim // chunk_size)              # Calcolo del numero di parti
+                            resto = tot_dim % chunk_size                            # Eventuale resto
                             if resto != 0.0:
                                 num_of_chunks += 1
 
-                            file.seek(0, 0)
+                            file.seek(0, 0)                                         # Spostamento all'inizio del file
+
                             try:
-                                buff = file.read(chunk_dim)
+                                buff = file.read(chunk_size)                        # Lettura del primo chunk
                                 chunk_sent = 0
 
-                                msg = 'ARET' + str(num_of_chunks).zfill(6)
+                                msg = 'ARET' + str(num_of_chunks).zfill(6)          # Risposta alla richiesta di download, deve contenere ARET ed il numero di chunks che saranno inviati
                                 print 'Upload Message: ' + msg
                                 self.conn.sendall(msg)
                                 print 'Sending chunks...'
 
-                                while len(buff) == chunk_dim:
+                                while len(buff) == chunk_size:                      # Invio dei chunks
                                     try:
                                         msg = str(len(buff)).zfill(5) + buff
                                         self.conn.sendall(msg)
                                         chunk_sent += 1
                                         print 'Sent ' + str(chunk_sent)
-                                        buff = file.read(chunk_dim)
+                                        buff = file.read(chunk_size)
                                     except IOError:
                                         print "Connection error due to the death of the peer!!!\n"
-                                if len(buff) != 0:
+                                if len(buff) != 0:                                  # Invio dell'eventuale resto, se più piccolo di chunk_size
                                     msg = str(len(buff)).zfill(5) + buff
                                     self.conn.sendall(msg)
                                 print "Upload Completed"
-                                file.close()
+                                file.close()                                        # Chiusura del file
                             except EOFError:
                                 print "You have read a EOF char"
             else:
                 print "Error: unknown directory response.\n"
 
-        self.conn.shutdown(1)
-        self.conn.close()
+        self.conn.shutdown(1)                                                       # Segnalazione di fine comunicazione
+        self.conn.close()                                                           # Chiusura com

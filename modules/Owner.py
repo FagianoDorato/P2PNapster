@@ -2,12 +2,10 @@ class Owner:
     """
     Rappresenta un peer che mette a disposizione un file per il download
 
-    :param ipv4: indirizzo ipv4 del peer
-    :type ipv4: str
-    :param ipv6: indirizzo ipv6 del peer
-    :type ipv6: str
-    :param port: porta del peer
-    :type port: str
+    Attributes:
+        ipv4: indirizzo ipv4 del peer
+        ipv6: indirizzo ipv6 del peer
+        port: porta del peer
     """
     ipv4 = None
     ipv6 = None

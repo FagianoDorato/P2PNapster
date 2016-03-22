@@ -21,7 +21,7 @@ while p.session_id is None:
             print 'Please select an option'
         elif option == 'e':
             print 'Bye bye'
-            quit()              # Interrompo l'esecuzione
+            sys.exit()          # Interrompo l'esecuzione
         else:
             try:
                 int_option = int(option)
@@ -33,9 +33,12 @@ while p.session_id is None:
     else:
         p.login()           # Effettua il login
 
-        # Inizializzazione del server multithread che risponde alle richieste di download
-        peerserver = PeerServer.PeerServer(p.my_ipv4, p.my_ipv6, p.my_port, p.files_list)
-        peerserver.start()
+        if p.session_id is not None:
+            # Inizializzazione del server multithread che risponde alle richieste di download
+            peerserver = PeerServer.PeerServer(p.my_ipv4, p.my_ipv6, p.my_port, p.files_list)
+            peerserver.start()
+        else:
+            break
 
         while p.session_id is not None:     # Utente loggato
             print "\nSelect one of the following options:"
@@ -68,6 +71,7 @@ while p.session_id is None:
             elif int_option == 4:
                 p.logout()          # Logout
                 peerserver.stop()   # Terminazione del server multithread che risponde alle richieste di download
+                sys.exit()          # Interrompo l'esecuzione
             else:
                 print 'Option ' + str(int_option) + ' not available'
 
