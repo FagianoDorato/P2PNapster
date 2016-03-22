@@ -65,8 +65,8 @@ class Peer(object):
             print 'Message sent, waiting for response...'
             response_message = self.directory.recv(20)                                  # Risposta della directory, deve contenere ALGI e il session id
             print 'Directory responded: ' + response_message
-        except socket.error as e:
-            print 'Socket Error: ' + e.message
+        except socket.error, msg:
+            print 'Socket Error: ' + msg
         except Exception as e:
             print 'Error: ' + e.message
         else:
@@ -95,8 +95,8 @@ class Peer(object):
 
             response_message = self.directory.recv(7)                                   # Risposta della directory, deve contenere ALGO e il numero di file che erano stati condivisi
             print 'Directory responded: ' + response_message
-        except socket.error as e:
-            print 'Socket Error: ' + e.message
+        except socket.error, msg:
+            print 'Socket Error: ' + msg
         except Exception as e:
             print 'Error: ' + e.message
         else:
@@ -153,8 +153,8 @@ class Peer(object):
 
                                 response_message = self.directory.recv(7)               # Risposta della directory, deve contenere AADD ed il numero di copie del file già condivise
                                 print 'Directory responded: ' + response_message
-                            except socket.error as e:
-                                print 'Socket Error: ' + e.message
+                            except socket.error, msg:
+                                print 'Socket Error: ' + msg
                             except Exception as e:
                                 print 'Error: ' + e.message
                             else:
@@ -208,8 +208,8 @@ class Peer(object):
 
                                 response_message = self.directory.recv(7)               # Risposta della directory, deve contenere ADEL e il numero di copie rimanenti
                                 print 'Directory responded: ' + response_message
-                            except socket.error as e:
-                                print 'Socket Error: ' + e.message
+                            except socket.error, msg:
+                                print 'Socket Error: ' + msg
                             except Exception as e:
                                 print 'Error: ' + e.message
                             else:
@@ -247,8 +247,8 @@ class Peer(object):
                 response_message = self.directory.recv(4)                               # Risposta della directory, deve contenere AFIN seguito dal numero di identificativi md5
                                                                                         # disponibili e dalla lista di file e peer che li hanno condivisi
                 print 'Directory responded: ' + response_message
-            except socket.error as e:
-                print 'Socket Error: ' + e.message
+            except socket.error, msg:
+                print 'Socket Error: ' + msg
             except Exception as e:
                 print 'Error: ' + e.message
 
@@ -293,8 +293,8 @@ class Peer(object):
 
                                     available_files.append(SharedFile(file_i_name, file_i_md5, file_owners))
 
-                            except socket.error as e:
-                                print 'Socket Error: ' + e.message
+                            except socket.error, msg:
+                                print 'Socket Error: ' + msg
                             except Exception as e:
                                 print 'Error: ' + e.message
 
@@ -333,7 +333,7 @@ class Peer(object):
                                 selected_peer = None
                                 while selected_peer is None:
                                     try:
-                                        option = raw_input()
+                                        option = raw_input()                            # Selezione di un peer da cui scaricare il file
                                     except SyntaxError:
                                         option = None
 
@@ -347,10 +347,9 @@ class Peer(object):
                                         except ValueError:
                                             print "A number is required"
 
-                                for idx2, owner in enumerate(file_to_download.owners):
+                                for idx2, owner in enumerate(file_to_download.owners):  # Download del file selezionato
                                     if selected_peer == idx2:
                                         print "Downloading file from: " + owner.ipv4 + " | " + owner.ipv6 + " " + owner.port
                                         Download.get_file(self.session_id, owner.ipv4, owner.ipv6, owner.port, file_to_download, self.directory)
-                                        #Download.warns_directory(self.session_id, file_to_download.md5, )
                         else:
                             print "Unknown error, check your code!"
