@@ -66,7 +66,7 @@ class Peer(object):
             response_message = self.directory.recv(20)                                  # Risposta della directory, deve contenere ALGI e il session id
             print 'Directory responded: ' + response_message
         except socket.error, msg:
-            print 'Socket Error: ' + msg
+            print 'Socket Error: ' + str(msg)
         except Exception as e:
             print 'Error: ' + e.message
         else:
@@ -96,7 +96,7 @@ class Peer(object):
             response_message = self.directory.recv(7)                                   # Risposta della directory, deve contenere ALGO e il numero di file che erano stati condivisi
             print 'Directory responded: ' + response_message
         except socket.error, msg:
-            print 'Socket Error: ' + msg
+            print 'Socket Error: ' + str(msg)
         except Exception as e:
             print 'Error: ' + e.message
         else:
@@ -154,7 +154,7 @@ class Peer(object):
                                 response_message = self.directory.recv(7)               # Risposta della directory, deve contenere AADD ed il numero di copie del file già condivise
                                 print 'Directory responded: ' + response_message
                             except socket.error, msg:
-                                print 'Socket Error: ' + msg
+                                print 'Socket Error: ' + str(msg)
                             except Exception as e:
                                 print 'Error: ' + e.message
                             else:
@@ -209,7 +209,7 @@ class Peer(object):
                                 response_message = self.directory.recv(7)               # Risposta della directory, deve contenere ADEL e il numero di copie rimanenti
                                 print 'Directory responded: ' + response_message
                             except socket.error, msg:
-                                print 'Socket Error: ' + msg
+                                print 'Socket Error: ' + str(msg)
                             except Exception as e:
                                 print 'Error: ' + e.message
                             else:
@@ -248,7 +248,7 @@ class Peer(object):
                                                                                         # disponibili e dalla lista di file e peer che li hanno condivisi
                 print 'Directory responded: ' + response_message
             except socket.error, msg:
-                print 'Socket Error: ' + msg
+                print 'Socket Error: ' + str(msg)
             except Exception as e:
                 print 'Error: ' + e.message
 
@@ -294,7 +294,7 @@ class Peer(object):
                                     available_files.append(SharedFile(file_i_name, file_i_md5, file_owners))
 
                             except socket.error, msg:
-                                print 'Socket Error: ' + msg
+                                print 'Socket Error: ' + str(msg)
                             except Exception as e:
                                 print 'Error: ' + e.message
 
