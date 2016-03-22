@@ -91,11 +91,11 @@ def get_file(session_id, host_ipv4, host_ipv6, host_port, file, directory):
                     print 'Error: ' + e.message
                     break
             fout.close()                                                            # Chiusura file a scrittura ultimata
-            print 'Download completed'
+            print '\nDownload completed'
 
             warns_directory(session_id, file.md5, directory)                        # Invocazione del metododo che segnala il download alla directory
             print 'Checking file integrity...'
-            downloaded_md5 = helpers.hashfile(open(fout.name, 'rb'), hashlib.md5())     # Controllo dell'integrità del file appena scarcato tramite md5
+            downloaded_md5 = helpers.hashfile(open(fout.name, 'rb'), hashlib.md5()) # Controllo dell'integrità del file appena scarcato tramite md5
             if file.md5 == downloaded_md5:
                 print 'The downloaded file is intact'
             else:

@@ -3,6 +3,7 @@ import threading
 import socket
 import helpers
 
+
 class PeerHandler(threading.Thread):
     """
     gestore dei peer che si connettono per scaricare un file
@@ -114,7 +115,7 @@ class PeerHandler(threading.Thread):
                                         self.conn.sendall(msg)                      # Invio di
                                         chunks_sent += 1
 
-                                        helpers.update_progress(chunks_sent, n_chunks, 'Uploading ' + file.name)    # Stampa a video del progresso dell'upload
+                                        helpers.update_progress(chunks_sent, n_chunks, 'Uploading ' + file.name)      # Stampa a video del progresso dell'upload
 
                                         buff = file.read(chunk_size)                # Lettura chunk successivo
                                     except IOError:
@@ -122,7 +123,7 @@ class PeerHandler(threading.Thread):
                                 if len(buff) != 0:                                  # Invio dell'eventuale resto, se più piccolo di chunk_size
                                     msg = str(len(buff)).zfill(5) + buff
                                     self.conn.sendall(msg)
-                                print "Upload Completed"
+                                print "\nUpload Completed"
                                 file.close()                                        # Chiusura del file
                             except EOFError:
                                 print "You have read a EOF char"
