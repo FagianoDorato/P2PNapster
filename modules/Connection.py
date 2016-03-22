@@ -43,7 +43,6 @@ class Connection:
         Crea una socket TCP selezionando un indirizzo a caso (con probabilità 50/50) tra ipv4 e ipv6
         Da utilizzare per le richieste alle directory
         """
-        # TODO: random stocazzo va dimmerda
         if random.choice((True, False)):
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)                 # creazione socket ipv4
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -95,7 +94,7 @@ class Connection:
 
     def listen_v4(self):
         """
-        Crea una socket TCP selezionando un indirizzo a caso (con probabilità 50/50) tra ipv4 e ipv6
+        Crea una socket TCP ipv4 in ascolto sull'indirizzo e porta specificati
         Da utilizzare per le richieste degli altri peer
         """
 
@@ -111,7 +110,7 @@ class Connection:
 
     def listen_v6(self):
         """
-        Crea una socket TCP selezionando un indirizzo a caso (con probabilità 50/50) tra ipv4 e ipv6
+        Crea una socket TCP ipv6 in ascolto sull'indirizzo e porta specificati
         Da utilizzare per le richieste degli altri peer
         """
         self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)                # creazione socket ipv6
